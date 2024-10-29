@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: travel-service
+
+  #datasource
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: url
+    username: username
+    password: password
+
+  #redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  #jpa
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+  #security
+  profiles:
+    include: secret
+
+# eureka
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: url
+
+server:
+  port: 8004
