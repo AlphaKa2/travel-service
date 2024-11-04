@@ -31,7 +31,7 @@ public class TravelController {
     }
 
     @GetMapping("/travels/{travelId}")
-    public ApiResponse<TravelReadRequest> readTravel(CurrentUser currentUser, @PathVariable("travelId") Long travelId) {
+        public ApiResponse<TravelReadRequest> readTravel(CurrentUser currentUser, @PathVariable("travelId") Long travelId) {
         TravelReadRequest response = travelPlansService.readTravelPlan(currentUser, travelId);
         return new ApiResponse<>(response);
     }
