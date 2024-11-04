@@ -18,5 +18,4 @@ import java.util.List;
 public class TravelScheduleDTO {
     private Long scheduleId;
     private List<TravelPlacesDTO> places;
-    private int scheduleOrder;
 }

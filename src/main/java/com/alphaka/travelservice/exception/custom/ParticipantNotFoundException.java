@@ -5,6 +5,6 @@ import com.alphaka.travelservice.exception.ErrorCode;
 
 public class ParticipantNotFoundException extends CustomException {
     public ParticipantNotFoundException() {
-        super(ErrorCode.PLAN_NOT_FOUND);
+        super(ErrorCode.PARTICIPANT_NOT_FOUND);
     }
 }

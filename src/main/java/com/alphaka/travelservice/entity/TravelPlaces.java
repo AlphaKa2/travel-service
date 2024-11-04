@@ -23,6 +23,7 @@ public class TravelPlaces {
 
     private String placeName;
     private String address;
+    private int placeOrder;
     private BigDecimal latitude;
     private BigDecimal longitude;
     private LocalDateTime createdAt;

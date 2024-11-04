@@ -6,8 +6,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/travel_db?rewriteBatchedStatements=true
-    username: root
-    password: wngur9836
+    username: name
+    password: password
 
   #redis
 #  data:
@@ -18,7 +18,7 @@ spring:
   #jpa
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -36,7 +36,7 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: url
 
 server:
   port: 8004

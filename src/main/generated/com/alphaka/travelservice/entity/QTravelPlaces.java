@@ -34,6 +34,8 @@ public class QTravelPlaces extends EntityPathBase<TravelPlaces> {
 
     public final StringPath placeName = createString("placeName");
 
+    public final NumberPath<Integer> placeOrder = createNumber("placeOrder", Integer.class);
+
     public final QTravelSchedules travelSchedule;
 
     public QTravelPlaces(String variable) {

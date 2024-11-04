@@ -9,7 +9,7 @@ import com.alphaka.travelservice.dto.request.ParticipantRequest;
 import com.alphaka.travelservice.dto.response.InvitationListDTO;
 import com.alphaka.travelservice.entity.*;
 import com.alphaka.travelservice.exception.custom.PlanNotFoundException;
-import com.alphaka.travelservice.exception.custom.ResourceNotFoundException;
+import com.alphaka.travelservice.exception.custom.InvitationNotFoundException;
 import com.alphaka.travelservice.repository.InvitationsRepository;
 import com.alphaka.travelservice.repository.TravelPlansRepository;
 import lombok.RequiredArgsConstructor;
@@ -69,6 +69,7 @@ public class InvitationService {
                     InvitationListDTO dto = new InvitationListDTO();
                     dto.setInvitationId(invitation.getInvitationId()); // Assuming invitation has an ID
                     dto.setInvitationMessage(invitation.getInvitationMessage()); // Assuming invitation has a message field
+                    dto.setInvitationStatus(invitation.getStatus());
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -82,7 +83,7 @@ public class InvitationService {
 //                .orElseThrow(() -> new PlanNotFoundException());
         // Fetch the invitation by user and travel ID
         Invitations invitation = (Invitations) invitationsRepository.findByUserIdAndTravelPlans_TravelId(currentUser.getUserId(), invitationDTO.getTravelId())
-                .orElseThrow(() -> new ResourceNotFoundException());
+                .orElseThrow(() -> new InvitationNotFoundException());
 
         // Update the invitation status with the value from the DTO
         invitation.setStatus(invitationDTO.getInvitationStatus());

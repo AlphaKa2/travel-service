@@ -24,7 +24,6 @@ public class TravelSchedules {
     @OneToMany(mappedBy = "travelSchedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TravelPlaces> places;
 
-    private int scheduleOrder;
     private LocalDateTime createdAt;
 
     @Column(nullable = true)

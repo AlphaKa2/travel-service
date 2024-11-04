@@ -17,6 +17,7 @@ public class TravelPlacesDTO {
 
     private String placeName;
     private String address;
+    private int placeOrder;
     private BigDecimal latitude;
     private BigDecimal longitude;
 }

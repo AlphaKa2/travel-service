@@ -28,8 +28,6 @@ public class QTravelSchedules extends EntityPathBase<TravelSchedules> {
 
     public final NumberPath<Long> scheduleId = createNumber("scheduleId", Long.class);
 
-    public final NumberPath<Integer> scheduleOrder = createNumber("scheduleOrder", Integer.class);
-
     public final QTravelDays travelDays;
 
     public final DateTimePath<java.time.LocalDateTime> updatedAt = createDateTime("updatedAt", java.time.LocalDateTime.class);
