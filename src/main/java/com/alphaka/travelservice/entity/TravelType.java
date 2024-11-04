@@ -1,5 +1,5 @@
 package com.alphaka.travelservice.entity;
 
 public enum TravelType {
-    BUSINESS, LEISURE
+    AI_GENERATED, YOUTUBE_GENERATED, USER_GENERATED
 }

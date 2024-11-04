@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -16,6 +17,8 @@ import com.querydsl.core.types.Path;
 public class QInvitations extends EntityPathBase<Invitations> {
 
     private static final long serialVersionUID = 1884474889L;
+
+    private static final PathInits INITS = PathInits.DIRECT2;
 
     public static final QInvitations invitations = new QInvitations("invitations");
 
@@ -27,22 +30,31 @@ public class QInvitations extends EntityPathBase<Invitations> {
 
     public final EnumPath<InvitationStatus> status = createEnum("status", InvitationStatus.class);
 
-    public final NumberPath<Long> travelId = createNumber("travelId", Long.class);
-
-    public final NumberPath<Long> travelId2 = createNumber("travelId2", Long.class);
+    public final QTravelPlans travelPlans;
 
     public final DateTimePath<java.time.LocalDateTime> updatedAt = createDateTime("updatedAt", java.time.LocalDateTime.class);
 
+    public final NumberPath<Long> userId = createNumber("userId", Long.class);
+
     public QInvitations(String variable) {
-        super(Invitations.class, forVariable(variable));
+        this(Invitations.class, forVariable(variable), INITS);
     }
 
     public QInvitations(Path<? extends Invitations> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QInvitations(PathMetadata metadata) {
-        super(Invitations.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QInvitations(PathMetadata metadata, PathInits inits) {
+        this(Invitations.class, metadata, inits);
+    }
+
+    public QInvitations(Class<? extends Invitations> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.travelPlans = inits.isInitialized("travelPlans") ? new QTravelPlans(forProperty("travelPlans")) : null;
     }
 
 }

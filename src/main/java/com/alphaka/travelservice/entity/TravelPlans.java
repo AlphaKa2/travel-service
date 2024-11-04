@@ -42,5 +42,9 @@ public class TravelPlans {
     @OneToMany(mappedBy = "travelPlans", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TravelDays> travelDays;
 
-    // Add other getters and setters
+    @OneToMany(mappedBy = "travelPlans", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Participants> participants;
+
+    @OneToMany(mappedBy = "travelPlans", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Invitations> invitations;
 }

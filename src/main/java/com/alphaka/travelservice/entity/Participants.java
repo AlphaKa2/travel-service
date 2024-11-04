@@ -16,14 +16,14 @@ public class Participants {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long participantId;
 
-    private Long travelId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "travel_id")
+    private TravelPlans travelPlans; // Reference to TravelPlans
 
-    private Long userId2;
+    private Long userId;
 
     @Enumerated(EnumType.STRING)
-    private Permission permission;
+    private Permission permission = Permission.VIEW;
 
     private LocalDateTime joinedAt;
-
-    // Getters and Setters
 }

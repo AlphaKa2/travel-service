@@ -16,9 +16,11 @@ public class Invitations {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long invitationId;
 
-    private Long travelId2;
+    private Long userId;
 
-    private Long travelId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "travel_id")
+    private TravelPlans travelPlans;
 
     private String invitationMessage;
 

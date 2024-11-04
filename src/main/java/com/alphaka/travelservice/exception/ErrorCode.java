@@ -34,7 +34,13 @@ public enum ErrorCode {
     S3_FILE_SIZE_EXCEEDED(400, "S3_006", "파일 크기가 너무 큽니다."),
 
     // Plan
-    PLAN_NOT_FOUND(404, "PLN001", "존재하지 않는 여행입니다.");
+    PLAN_NOT_FOUND(404, "PLN001", "존재하지 않는 여행입니다."),
+
+    // Participant
+    PARTICIPANT_NOT_FOUND(404, "PAL001", "존재하지 않는 참여 정보 입니다."),
+
+    // Invitation
+    INVITATION_NOT_FOUND(404, "INV001", "존재하지 않는 초대자 정보 입니다.");
 
     private final int status;
     private final String code;

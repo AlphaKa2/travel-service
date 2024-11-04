@@ -4,16 +4,13 @@ package com.alphaka.travelservice.controller;
 import com.alphaka.travelservice.common.dto.CurrentUser;
 import com.alphaka.travelservice.common.response.ApiResponse;
 import com.alphaka.travelservice.dto.request.TravelCreateRequest;
+import com.alphaka.travelservice.dto.request.TravelReadRequest;
+import com.alphaka.travelservice.dto.request.TravelUpdateRequest;
 import com.alphaka.travelservice.dto.response.TravelListDTO;
-import com.alphaka.travelservice.dto.response.TravelPlanDTO;
-import com.alphaka.travelservice.entity.TravelPlans;
 import com.alphaka.travelservice.service.TravelPlansService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -34,8 +31,8 @@ public class TravelController {
     }
 
     @GetMapping("/travels/{travelId}")
-    public ApiResponse<TravelPlanDTO> readTravel(CurrentUser currentUser, @PathVariable("travelId") Long travelId) {
-        TravelPlanDTO response = travelPlansService.readTravelPlan(currentUser, travelId);
+    public ApiResponse<TravelReadRequest> readTravel(CurrentUser currentUser, @PathVariable("travelId") Long travelId) {
+        TravelReadRequest response = travelPlansService.readTravelPlan(currentUser, travelId);
         return new ApiResponse<>(response);
     }
 
@@ -46,11 +43,13 @@ public class TravelController {
     }
 
 
-//    @PutMapping("/travels")
-//    public ApiResponse<Long> updateTravelByDTO() {
-//        Long response = travelPlanService.createTravelPlan(currentUser, request);
-//        return new ApiResponse<>(response);
-//    }
+    @PutMapping("/travels")
+    public ApiResponse<Long> updateTravelByDTO(CurrentUser currentUser,
+                                               @Valid @RequestBody List<TravelUpdateRequest> request) {
+        TravelUpdateRequest innerRequest = request.get(0);
+        Long response = travelPlansService.updateTravelPlan(currentUser, innerRequest);
+        return new ApiResponse<>(response);
+    }
 
     @DeleteMapping("/travels/{travelId}")
     public ApiResponse<Long> deleteTravelById(CurrentUser currentUser, @PathVariable("travelId") Long travelId) {

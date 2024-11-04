@@ -1,5 +1,5 @@
 package com.alphaka.travelservice.entity;
 
-enum InvitationStatus {
+public enum InvitationStatus {
     PENDING, ACCEPTED, REJECTED
 }
