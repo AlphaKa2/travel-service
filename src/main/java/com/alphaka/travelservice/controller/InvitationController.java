@@ -19,7 +19,7 @@ public class InvitationController {
     private final InvitationService invitationService;
 
     @PostMapping("/invitations")
-    public ApiResponse<Long> addInvitationByNick(CurrentUser currentUser, ParticipantRequest request) {
+    public ApiResponse<Long> addInvitationByNick(CurrentUser currentUser, @RequestBody ParticipantRequest request) {
 
         Long response = invitationService.addInvitation(currentUser, request);
         return new ApiResponse<>(response);

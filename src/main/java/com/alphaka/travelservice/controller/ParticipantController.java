@@ -19,8 +19,8 @@ public class ParticipantController {
 
     private final ParticipantService participantService;
 
-    @PostMapping("/participants")
-    public ApiResponse<Long> accessParticipantByNick(CurrentUser currentUser, ParticipantChangeRequest request) {
+    @PutMapping("/participants")
+    public ApiResponse<Long> accessParticipantByNick(CurrentUser currentUser, @RequestBody ParticipantChangeRequest request) {
 
         Long response = participantService.changeParticipant(currentUser, request);
         return new ApiResponse<>(response);
@@ -34,7 +34,7 @@ public class ParticipantController {
     }
 
     @DeleteMapping("/participants/{participantId}")
-    public ApiResponse<Long> deleteParticipantById(CurrentUser currentUser, @PathVariable("participant_id") Long participantId) {
+    public ApiResponse<Long> deleteParticipantById(CurrentUser currentUser, @PathVariable("participantId") Long participantId) {
 
         Long response = participantService.deleteParticipant(currentUser, participantId);
         return new ApiResponse<>(response);

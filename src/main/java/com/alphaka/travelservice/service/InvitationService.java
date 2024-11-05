@@ -50,6 +50,7 @@ public class InvitationService {
         // Step 4: Add the user as a participant in the travel plan
         Invitations newInvitation = new Invitations();
         newInvitation.setTravelPlans(travelPlan);
+        newInvitation.setUserId(userId);
         newInvitation.setInvitationMessage("해당 여행 계획 제목");
         newInvitation.setStatus(InvitationStatus.PENDING);
 
@@ -62,12 +63,12 @@ public class InvitationService {
     public List<InvitationListDTO> getInvitation(CurrentUser currentUser) {
         // Fetch the list of invitations for the current user
         List<Invitations> invitations = invitationsRepository.findByUserId(currentUser.getUserId());
-
         // Map each invitation to an InvitationListDTO
         List<InvitationListDTO> invitationDTOs = invitations.stream()
                 .map(invitation -> {
                     InvitationListDTO dto = new InvitationListDTO();
                     dto.setInvitationId(invitation.getInvitationId()); // Assuming invitation has an ID
+                    dto.setTravelId(invitation.getTravelPlans().getTravelId());
                     dto.setInvitationMessage(invitation.getInvitationMessage()); // Assuming invitation has a message field
                     dto.setInvitationStatus(invitation.getStatus());
                     return dto;

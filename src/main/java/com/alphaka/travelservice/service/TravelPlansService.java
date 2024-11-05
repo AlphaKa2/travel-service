@@ -384,84 +384,130 @@ public class TravelPlansService {
         return travelPlans.getTravelId();
     }
 
+//    @Transactional
+//    public Long updateTravelPlan(CurrentUser currentUser, TravelUpdateRequest request) {
+//        log.info("계획 업데이트 시작. 현재 사용자: {}, 여행 계획 ID: {}", currentUser.getNickname(), request.getTravelId());
+//
+//        // Step 1: Fetch existing TravelPlans entry or throw an exception if not found
+//        TravelPlans travelPlans = travelPlansRepository.findById(request.getTravelId())
+//                .orElseThrow(() -> new PlanNotFoundException());
+//
+//        // Step 2: Update TravelPlans basic information
+//        travelPlans.setName(request.getTitle());
+//        travelPlans.setDescription(request.getDescription());
+//        travelPlans.setTravelType(request.getTravelType());
+//        travelPlans.setTravelStatus(request.getTravelStatus());
+//        travelPlans.setUpdatedAt(LocalDateTime.now());
+//
+//        // Step 3: Delete all existing TravelDays, TravelSchedules, and TravelPlaces for this plan
+//        List<TravelDays> existingDays = travelPlans.getTravelDays();
+//        for (TravelDays day : existingDays) {
+//            if (day.getTravelSchedules() != null) {
+//                travelSchedulesRepository.deleteById(day.getTravelSchedules().getScheduleId());
+//            }
+//        }
+//        travelDaysRepository.deleteAll(existingDays);
+//
+//        // Step 4: Process new data from the request and save updated entries
+//        List<TravelDays> updatedDays = new ArrayList<>();
+//
+//        for (DayJsonData dayData : request.getDays()) {
+//            log.info("Processing day {}", dayData.getDay());
+//
+//            TravelDays travelDays = new TravelDays();
+//            travelDays.setTravelPlans(travelPlans);
+//            travelDays.setDayNumber(Integer.parseInt(dayData.getDay()));
+//            travelDays.setDate(LocalDate.now().plusDays(travelDays.getDayNumber()));
+//            travelDays = travelDaysRepository.save(travelDays);
+//
+//            // Initialize TravelSchedules with a non-null places list
+//            TravelSchedules travelSchedules = new TravelSchedules();
+//            travelSchedules.setPlaces(new ArrayList<>()); // Ensure places is not null
+//            travelSchedules.setTravelDays(travelDays);
+//            travelSchedules.setCreatedAt(LocalDateTime.now());
+//            travelSchedules = travelSchedulesRepository.save(travelSchedules);
+//
+//            int placeOrder = 1;
+//
+//            List<TravelPlaces> updatedPlaces = new ArrayList<>();
+//            for (ScheduleJsonData scheduleData : dayData.getSchedule()) {
+//                log.info("Adding place {}", scheduleData.getPlace());
+//
+//                TravelPlaces travelPlace = new TravelPlaces();
+//                travelPlace.setTravelSchedule(travelSchedules);
+//                travelPlace.setPlaceName(scheduleData.getPlace());
+//                travelPlace.setAddress(scheduleData.getAddress());
+//                travelPlace.setPlaceOrder(placeOrder++);
+//                travelPlace.setLatitude(new BigDecimal(scheduleData.getLatitude()));
+//                travelPlace.setLongitude(new BigDecimal(scheduleData.getLongitude()));
+//                travelPlace.setCreatedAt(LocalDateTime.now());
+//                updatedPlaces.add(travelPlacesRepository.save(travelPlace));
+//            }
+//
+//            // Add places to the travelSchedules entity
+//            travelSchedules.getPlaces().addAll(updatedPlaces);
+//
+//            // Set the schedule in the day entity and add the day to updatedDays
+//            travelDays.setTravelSchedules(travelSchedules);
+//            updatedDays.add(travelDays);
+//        }
+//
+//        // Update travel plan with the new days list
+//        travelPlans.getTravelDays().clear();
+//        travelPlans.getTravelDays().addAll(updatedDays);
+//
+//        // Save the updated TravelPlans
+//        travelPlansRepository.save(travelPlans);
+//
+//        log.info("계획 업데이트 완료. 여행 계획 ID: {}", travelPlans.getTravelId());
+//        return travelPlans.getTravelId();
+//    }
+
     @Transactional
     public Long updateTravelPlan(CurrentUser currentUser, TravelUpdateRequest request) {
-        log.info("계획 업데이트 시작. 현재 사용자: {}, 여행 계획 ID: {}", currentUser.getNickname(), request.getTravelId());
+        // Step 1: Save TravelPlans and related TravelDays entries
+        List<Object[]> travelDaysParams = new ArrayList<>();
+        List<Object[]> travelSchedulesParams = new ArrayList<>();
 
-        // Step 1: Fetch existing TravelPlans entry or throw an exception if not found
-        TravelPlans travelPlans = travelPlansRepository.findById(request.getTravelId())
-                .orElseThrow(() -> new PlanNotFoundException());
-
-        // Step 2: Update TravelPlans basic information
-        travelPlans.setName(request.getTitle());
-        travelPlans.setDescription(request.getDescription());
-        travelPlans.setTravelType(request.getTravelType());
-        travelPlans.setTravelStatus(request.getTravelStatus());
-        travelPlans.setUpdatedAt(LocalDateTime.now());
-
-        // Step 3: Delete all existing TravelDays, TravelSchedules, and TravelPlaces for this plan
-        List<TravelDays> existingDays = travelPlans.getTravelDays();
-        for (TravelDays day : existingDays) {
-            if (day.getTravelSchedules() != null) {
-                travelSchedulesRepository.deleteById(day.getTravelSchedules().getScheduleId());
-            }
-        }
-        travelDaysRepository.deleteAll(existingDays);
-
-        // Step 4: Process new data from the request and save updated entries
-        List<TravelDays> updatedDays = new ArrayList<>();
-
+        // First, insert travel_days entries
         for (DayJsonData dayData : request.getDays()) {
-            log.info("Processing day {}", dayData.getDay());
-
-            TravelDays travelDays = new TravelDays();
-            travelDays.setTravelPlans(travelPlans);
-            travelDays.setDayNumber(Integer.parseInt(dayData.getDay()));
-            travelDays.setDate(LocalDate.now().plusDays(travelDays.getDayNumber()));
-            travelDays = travelDaysRepository.save(travelDays);
-
-            // Initialize TravelSchedules with a non-null places list
-            TravelSchedules travelSchedules = new TravelSchedules();
-            travelSchedules.setPlaces(new ArrayList<>()); // Ensure places is not null
-            travelSchedules.setTravelDays(travelDays);
-            travelSchedules.setCreatedAt(LocalDateTime.now());
-            travelSchedules = travelSchedulesRepository.save(travelSchedules);
-
-            int placeOrder = 1;
-
-            List<TravelPlaces> updatedPlaces = new ArrayList<>();
-            for (ScheduleJsonData scheduleData : dayData.getSchedule()) {
-                log.info("Adding place {}", scheduleData.getPlace());
-
-                TravelPlaces travelPlace = new TravelPlaces();
-                travelPlace.setTravelSchedule(travelSchedules);
-                travelPlace.setPlaceName(scheduleData.getPlace());
-                travelPlace.setAddress(scheduleData.getAddress());
-                travelPlace.setPlaceOrder(placeOrder++);
-                travelPlace.setLatitude(new BigDecimal(scheduleData.getLatitude()));
-                travelPlace.setLongitude(new BigDecimal(scheduleData.getLongitude()));
-                travelPlace.setCreatedAt(LocalDateTime.now());
-                updatedPlaces.add(travelPlacesRepository.save(travelPlace));
-            }
-
-            // Add places to the travelSchedules entity
-            travelSchedules.getPlaces().addAll(updatedPlaces);
-
-            // Set the schedule in the day entity and add the day to updatedDays
-            travelDays.setTravelSchedules(travelSchedules);
-            updatedDays.add(travelDays);
+            // Prepare parameters for travel_days
+            travelDaysParams.add(new Object[]{
+                    request.getTravelId(),
+                    Integer.parseInt(dayData.getDay()),
+                    Date.valueOf(LocalDate.now().plusDays(Integer.parseInt(dayData.getDay())))
+            });
         }
 
-        // Update travel plan with the new days list
-        travelPlans.getTravelDays().clear();
-        travelPlans.getTravelDays().addAll(updatedDays);
+        // Batch update travel_days
+        String insertTravelDaysSql = "INSERT INTO travel_days (travel_id, day_number, date) VALUES (?, ?, ?)";
+        jdbcTemplate.batchUpdate(insertTravelDaysSql, travelDaysParams);
 
-        // Save the updated TravelPlans
-        travelPlansRepository.save(travelPlans);
+        // Retrieve day_id values for scheduling
+        List<Long> dayIds = jdbcTemplate.queryForList("SELECT day_id FROM travel_days WHERE travel_id = ?",
+                Long.class, request.getTravelId());
 
-        log.info("계획 업데이트 완료. 여행 계획 ID: {}", travelPlans.getTravelId());
-        return travelPlans.getTravelId();
+        int index = 0;
+        for (DayJsonData dayData : request.getDays()) {
+            Long dayId = dayIds.get(index++);
+
+            // Prepare travel_schedules using the valid day_id
+            travelSchedulesParams.add(new Object[]{
+                    dayId,
+                    Timestamp.valueOf(LocalDateTime.now())
+            });
+        }
+
+        // Batch update travel_schedules after travel_days insertion
+        String insertTravelSchedulesSql = "INSERT INTO travel_schedules (day_id, created_at) VALUES (?, ?)";
+        jdbcTemplate.batchUpdate(insertTravelSchedulesSql, travelSchedulesParams);
+
+        // Continue with updating travelPlaces or other entities after schedules if needed.
+
+        return request.getTravelId(); // Return updated Travel Plan ID
     }
+
+
 
 
 

@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InvitationListDTO {
+    private Long travelId;
     private Long invitationId;
     private String invitationMessage;
     private InvitationStatus invitationStatus;
