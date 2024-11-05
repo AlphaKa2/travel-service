@@ -1,5 +1,5 @@
 package com.alphaka.travelservice.entity;
 
-enum Permission {
+public enum Permission {
     VIEW, EDIT
 }

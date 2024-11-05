@@ -1,29 +1,29 @@
 package com.alphaka.travelservice.dto.request;
 
-
+import com.alphaka.travelservice.dto.response.TravelDayDTO;
 import com.alphaka.travelservice.entity.TravelStatus;
 import com.alphaka.travelservice.entity.TravelType;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TravelCreateRequest {
+public class TravelReadRequest {
+    private Long travelId;
+    private Long userId;
     private String title;
     private String description;
+    private List<TravelDayDTO> days;
+    private TravelType travelType;
+    private TravelStatus travelStatus;
+
     private LocalDate startDate;
     private LocalDate endDate;
-    private List<DayJsonData> days;
 }
-

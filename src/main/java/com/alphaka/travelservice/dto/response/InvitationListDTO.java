@@ -1,20 +1,18 @@
 package com.alphaka.travelservice.dto.response;
 
-import com.alphaka.travelservice.dto.request.DayJsonData;
+import com.alphaka.travelservice.entity.InvitationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TravelPlanDTO {
+public class InvitationListDTO {
     private Long travelId;
-    private String title;
-    private String description;
-    private List<TravelDayDTO> days;
+    private Long invitationId;
+    private String invitationMessage;
+    private InvitationStatus invitationStatus;
 }

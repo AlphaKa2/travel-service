@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TravelDayDTO {
+    private Long dayId;
     private String day;
     private List<TravelScheduleDTO> schedule;
 }

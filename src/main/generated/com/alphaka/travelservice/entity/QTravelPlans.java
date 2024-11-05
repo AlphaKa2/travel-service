@@ -28,7 +28,11 @@ public class QTravelPlans extends EntityPathBase<TravelPlans> {
 
     public final DatePath<java.time.LocalDate> endDate = createDate("endDate", java.time.LocalDate.class);
 
+    public final ListPath<Invitations, QInvitations> invitations = this.<Invitations, QInvitations>createList("invitations", Invitations.class, QInvitations.class, PathInits.DIRECT2);
+
     public final StringPath name = createString("name");
+
+    public final ListPath<Participants, QParticipants> participants = this.<Participants, QParticipants>createList("participants", Participants.class, QParticipants.class, PathInits.DIRECT2);
 
     public final DatePath<java.time.LocalDate> startDate = createDate("startDate", java.time.LocalDate.class);
 
