@@ -1,8 +1,12 @@
 package com.alphaka.travelservice.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,8 +14,8 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @Table(name = "travel_plans")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TravelPlans {
 
     @Id
@@ -19,7 +23,7 @@ public class TravelPlans {
     private Long travelId;
 
     private Long userId;
-    private String name;
+    private String travelName;
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -29,14 +33,14 @@ public class TravelPlans {
     private LocalDate endDate;
 
     @Enumerated(EnumType.STRING)
-    private TravelStatus travelStatus = TravelStatus.RECOMMENDED;
+    private TravelStatus travelStatus = TravelStatus.PLANNED;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column(nullable = true)
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @Column(nullable = true)
     private LocalDateTime deletedAt;
 
     @OneToMany(mappedBy = "travelPlans", cascade = CascadeType.ALL, orphanRemoval = true)

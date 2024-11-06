@@ -1,7 +1,9 @@
 package com.alphaka.travelservice.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -9,8 +11,8 @@ import java.math.BigDecimal;
 
 @Entity
 @Getter
-@Setter
 @Table(name = "travel_places")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TravelPlaces {
 
     @Id
@@ -18,14 +20,12 @@ public class TravelPlaces {
     private Long placeId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "schedule_id", nullable = false)
-    private TravelSchedules travelSchedule;
+    @JoinColumn(name = "schedule_id")
+    private TravelSchedules travelSchedules;
 
     private String placeName;
     private String address;
-    private int placeOrder;
-    private BigDecimal latitude;
-    private BigDecimal longitude;
-    private LocalDateTime createdAt;
+    private String latitude;
+    private String longitude;
 }
 
