@@ -1,6 +1,5 @@
 package com.alphaka.travelservice.dto.response;
 
-import com.alphaka.travelservice.dto.request.DayJsonData;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

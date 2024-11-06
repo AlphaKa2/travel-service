@@ -1,4 +1,4 @@
-package com.alphaka.travelservice.repository;
+package com.alphaka.travelservice.repository.travel;
 
 import com.alphaka.travelservice.entity.TravelSchedules;
 import org.springframework.data.jpa.repository.JpaRepository;

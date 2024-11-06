@@ -1,6 +1,5 @@
 package com.alphaka.travelservice.dto.request;
 
-import com.alphaka.travelservice.dto.response.TravelDayDTO;
 import com.alphaka.travelservice.entity.TravelStatus;
 import com.alphaka.travelservice.entity.TravelType;
 import lombok.AllArgsConstructor;
@@ -20,7 +19,7 @@ public class TravelUpdateRequest {
     private Long userId;
     private String title;
     private String description;
-    private List<DayJsonData> days;
+    private List<TravelDayRequest> days;
     private TravelType travelType;
     private TravelStatus travelStatus;
 
