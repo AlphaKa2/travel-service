@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ErrorCode {
 
-    // auth
+    // Auth
     UNAUTHORIZED(401, "AUT001", "인증되지 않은 사용자입니다."),
     SIGNIN_REQUIRED(401, "AUT002", "로그인이 필요합니다."),
 
@@ -33,8 +33,9 @@ public enum ErrorCode {
     S3_OBJECT_UPLOAD_FAILED(500, "S3_005", "객체 업로드 중 오류가 발생했습니다."),
     S3_FILE_SIZE_EXCEEDED(400, "S3_006", "파일 크기가 너무 큽니다."),
 
-    // Plan
+    // Travel
     PLAN_NOT_FOUND(404, "PLN001", "존재하지 않는 여행입니다."),
+    INVALID_TRAVEL_DAY(400, "PLN002", "여행 일자가 올바르지 않습니다."),
 
     // Participant
     PARTICIPANT_NOT_FOUND(404, "PAL001", "존재하지 않는 참여 정보 입니다."),

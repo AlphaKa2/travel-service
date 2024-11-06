@@ -1,15 +1,17 @@
 package com.alphaka.travelservice.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
 @Table(name = "participants")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Participants {
 
     @Id

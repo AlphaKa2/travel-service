@@ -1,32 +1,42 @@
 package com.alphaka.travelservice.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @Table(name = "travel_schedules")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TravelSchedules {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long scheduleId;
 
-    @OneToOne
-    @JoinColumn(name = "day_id", referencedColumnName = "dayId")
+    private int scheduleOrder;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "day_id")
     private TravelDays travelDays;
 
-    @OneToMany(mappedBy = "travelSchedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    private LocalTime startTime;
+    private LocalTime endTime;
+
+    @OneToMany(mappedBy = "travelSchedules", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TravelPlaces> places;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column(nullable = true)
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
 }

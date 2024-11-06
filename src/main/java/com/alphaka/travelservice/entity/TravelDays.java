@@ -1,15 +1,18 @@
 package com.alphaka.travelservice.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
-@Table(name = "travel_days")
 @Getter
-@Setter
+@Table(name = "travel_days")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TravelDays {
 
     @Id
@@ -23,7 +26,7 @@ public class TravelDays {
     private int dayNumber;
     private LocalDate date;
 
-    @OneToOne(mappedBy = "travelDays", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private TravelSchedules travelSchedules;
+    @OneToMany(mappedBy = "travelDays", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TravelSchedules> travelSchedules;
 
 }
