@@ -4,6 +4,7 @@ import com.alphaka.travelservice.common.dto.CurrentUser;
 import com.alphaka.travelservice.common.response.ApiResponse;
 import com.alphaka.travelservice.dto.request.TravelPlanCreateRequest;
 import com.alphaka.travelservice.dto.request.TravelPlanUpdateRequest;
+import com.alphaka.travelservice.dto.response.TravelPlanResponse;
 import com.alphaka.travelservice.service.TravelPlansService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,16 @@ public class TravelController {
 
     /**
      * 여행 계획 상세 조회
+     * @param currentUser - 현재 사용자 정보
+     * @param travelId - 여행 계획 ID
+     * @return ApiResponse<TravelPlanResponse> - 여행 계획 상세 정보
      */
+    @GetMapping("/{travelId}")
+    public ApiResponse<TravelPlanResponse> getTravelPlanDetail(CurrentUser currentUser,
+                                                               @PathVariable("travelId") Long travelId) {
+        TravelPlanResponse response = travelPlansService.getTravelPlan(currentUser, travelId);
+        return new ApiResponse<>(response);
+    }
 
     /**
      * 여행 계획 수정

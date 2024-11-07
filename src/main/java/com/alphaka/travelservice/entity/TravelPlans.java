@@ -25,6 +25,7 @@ public class TravelPlans {
     private Long userId;
     private String travelName;
     private String description;
+    private Long preferenceId;
 
     @Enumerated(EnumType.STRING)
     private TravelType travelType;

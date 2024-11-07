@@ -1,7 +1,10 @@
 package com.alphaka.travelservice.service;
 
+import com.alphaka.travelservice.client.UserClient;
 import com.alphaka.travelservice.common.dto.CurrentUser;
+import com.alphaka.travelservice.common.dto.UserDTO;
 import com.alphaka.travelservice.dto.request.*;
+import com.alphaka.travelservice.dto.response.TravelPlanResponse;
 import com.alphaka.travelservice.entity.*;
 import com.alphaka.travelservice.exception.custom.InvalidTravelDayException;
 import com.alphaka.travelservice.exception.custom.PlanNotFoundException;
@@ -27,10 +30,56 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class TravelPlansService {
 
+    private final UserClient userClient;
     private final TravelPlansRepository travelPlansRepository;
     private final ParticipantsRepository participantsRepository;
     private final ParticipantService participantService;
     private final TravelPlacesRepository travelPlacesRepository;
+
+    /**
+     * 여행 계획 상세 조회
+     * @param currentUser - 현재 사용자 정보
+     * @param travelId - 여행 계획 ID
+     * @return TravelPlanResponse - 여행 계획 상세 정보
+     */
+    public TravelPlanResponse getTravelPlan(CurrentUser currentUser, Long travelId) {
+        log.info("여행 계획 상세 조회 시작. 현재 사용자: {}, 여행 계획 ID: {}", currentUser.getNickname(), travelId);
+
+        // 여행 계획 조회
+        TravelPlanResponse travelPlan = travelPlansRepository.getTravelPlanDetail(travelId);
+        if (travelPlan == null) throw new PlanNotFoundException();
+
+        // 여행 참가자 목록 id 리스트로 변환
+        Set<Long> participantsList = travelPlansRepository.findById(travelId)
+                .orElseThrow(PlanNotFoundException::new)
+                .getParticipants()
+                .stream()
+                .map(Participants::getUserId)
+                .collect(Collectors.toSet());
+
+        // 현재 사용자가 참가자 목록에 있는지 확인
+        if (!participantsList.contains(currentUser.getUserId())) {
+            log.warn("사용자가 여행 참가자 목록에 없습니다. 사용자: {}, 여행 계획 ID: {}", currentUser.getNickname(), travelId);
+            throw new UnauthorizedException();
+        }
+
+        // 참가자 닉네임 목록 설정
+        List<UserDTO> participantsInfo = userClient.getUsersById(participantsList).getData();
+        travelPlan.setParticipants(participantsInfo.stream()
+                .map(UserDTO::getNickname)
+                .collect(Collectors.toList()));
+
+
+        // lastUpdatedBy 설정
+        String lastUpdatedByNickname = userClient.findUserById(travelPlansRepository.findById(travelId)
+                        .orElseThrow(PlanNotFoundException::new)
+                        .getLastUpdatedBy())
+                .getData()
+                .getNickname();
+        travelPlan.setLastUpdatedBy(lastUpdatedByNickname);
+
+        return travelPlan;
+    }
 
     /**
      * 여행 계획 생성
