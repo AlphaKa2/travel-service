@@ -4,12 +4,12 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -41,14 +41,24 @@ public class TravelPlans {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    private Long lastUpdatedBy;
+
     private LocalDateTime deletedAt;
 
     @OneToMany(mappedBy = "travelPlans", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TravelDays> travelDays;
+    private List<TravelDays> travelDays = new ArrayList<>();
 
     @OneToMany(mappedBy = "travelPlans", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Participants> participants;
+    private List<Participants> participants = new ArrayList<>();
 
     @OneToMany(mappedBy = "travelPlans", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Invitations> invitations;
+    private List<Invitations> invitations = new ArrayList<>();
+
+    public void updateTravelPlans(String travelName, String description, LocalDate startDate, LocalDate endDate, Long lastUpdatedBy) {
+        this.travelName = travelName;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.lastUpdatedBy = lastUpdatedBy;
+    }
 }

@@ -2,6 +2,7 @@ package com.alphaka.travelservice.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,7 +10,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 
 @Entity
 @Getter
@@ -30,8 +30,8 @@ public class TravelSchedules {
     private LocalTime startTime;
     private LocalTime endTime;
 
-    @OneToMany(mappedBy = "travelSchedules", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TravelPlaces> places;
+    @OneToOne(mappedBy = "travelSchedules", cascade = CascadeType.ALL, orphanRemoval = true)
+    private TravelPlaces place;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -39,4 +39,22 @@ public class TravelSchedules {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @Builder
+    public TravelSchedules(TravelDays travelDays, int scheduleOrder, LocalTime startTime, LocalTime endTime) {
+        this.travelDays = travelDays;
+        this.scheduleOrder = scheduleOrder;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
+    public void updateTravelSchedules(TravelDays travelDays, int scheduleOrder, LocalTime startTime, LocalTime endTime) {
+        this.travelDays = travelDays;
+        this.scheduleOrder = scheduleOrder;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
+    public void setPlace(TravelPlaces place) {
+        this.place = place;
+    }
 }
