@@ -1,6 +1,21 @@
 package com.alphaka.travelservice.repository.travel;
 
-import com.alphaka.travelservice.dto.request.*;
+import com.alphaka.travelservice.dto.request.TravelDayRequest;
+import com.alphaka.travelservice.dto.request.TravelPlaceRequest;
+import com.alphaka.travelservice.dto.request.TravelPlanCreateRequest;
+import com.alphaka.travelservice.dto.request.TravelScheduleRequest;
+import com.alphaka.travelservice.dto.response.TravelDayResponse;
+import com.alphaka.travelservice.dto.response.TravelPlaceResponse;
+import com.alphaka.travelservice.dto.response.TravelPlanResponse;
+import com.alphaka.travelservice.dto.response.TravelScheduleResponse;
+import com.alphaka.travelservice.entity.QTravelDays;
+import com.alphaka.travelservice.entity.QTravelPlaces;
+import com.alphaka.travelservice.entity.QTravelPlans;
+import com.alphaka.travelservice.entity.QTravelSchedules;
+import com.alphaka.travelservice.exception.custom.PlanNotFoundException;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +31,9 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Repository
@@ -24,6 +41,100 @@ import java.util.List;
 public class TravelPlansRepositoryImpl implements TravelPlansRepositoryCustom {
 
     private final JdbcTemplate jdbcTemplate;
+    private final JPAQueryFactory queryFactory;
+
+    /**
+     * 여행 계획을 상세 조회
+     * @param travelId - 여행 계획 ID
+     * @return TravelPlanResponse - 여행 계획 상세 정보
+     */
+    @Override
+    public TravelPlanResponse getTravelPlanDetail(Long travelId) {
+        QTravelPlans qPlan = QTravelPlans.travelPlans;
+        QTravelDays qDay = QTravelDays.travelDays;
+        QTravelSchedules qSchedule = QTravelSchedules.travelSchedules;
+        QTravelPlaces qPlace = QTravelPlaces.travelPlaces;
+
+        // 여행 계획 조회
+        TravelPlanResponse travelPlan = queryFactory
+                .select(Projections.constructor(TravelPlanResponse.class,
+                        qPlan.travelId,
+                        qPlan.travelName,
+                        qPlan.description,
+                        qPlan.travelType,
+                        qPlan.travelStatus,
+                        qPlan.startDate,
+                        qPlan.endDate,
+                        qPlan.createdAt))
+                .from(qPlan)
+                .where(qPlan.travelId.eq(travelId))
+                .fetchOne();
+
+        if (travelPlan == null) throw new PlanNotFoundException();
+
+        // TravelDays와 TravelSchedules, TravelPlaces를 조인하여 한 번에 조회
+        List<Tuple> tuples = queryFactory
+                .select(qPlan.travelId,
+                        qDay.dayId,
+                        qDay.dayNumber,
+                        qDay.date,
+                        qSchedule.scheduleId,
+                        qSchedule.scheduleOrder,
+                        qSchedule.startTime,
+                        qSchedule.endTime,
+                        qPlace.placeId,
+                        qPlace.placeName,
+                        qPlace.address,
+                        qPlace.latitude,
+                        qPlace.longitude)
+                .from(qPlan)
+                .leftJoin(qPlan.travelDays, qDay)
+                .leftJoin(qDay.travelSchedules, qSchedule)
+                .leftJoin(qSchedule.place, qPlace)
+                .where(qPlan.travelId.eq(travelId))
+                .orderBy(qDay.dayNumber.asc(), qSchedule.scheduleOrder.asc())
+                .fetch();
+
+        // Map을 사용하여 TravelDayResponse와 TravelScheduleResponse를 구성
+        Map<Long, TravelDayResponse> dayMap = new LinkedHashMap<>();
+
+        for (Tuple tuple : tuples) {
+            Long dayId = tuple.get(qDay.dayId);
+            if (!dayMap.containsKey(dayId)) {
+                TravelDayResponse dayResponse = new TravelDayResponse(
+                        dayId,
+                        tuple.get(qDay.dayNumber),
+                        tuple.get(qDay.date)
+                );
+                dayMap.put(dayId, dayResponse);
+            }
+
+            // 스케줄이 존재할 경우에만 추가
+            Long scheduleId = tuple.get(qSchedule.scheduleId);
+            if (scheduleId != null) {
+                TravelScheduleResponse scheduleResponse = new TravelScheduleResponse(
+                        scheduleId,
+                        tuple.get(qSchedule.scheduleOrder),
+                        new TravelPlaceResponse(
+                                tuple.get(qPlace.placeId),
+                                tuple.get(qPlace.placeName),
+                                tuple.get(qPlace.address),
+                                tuple.get(qPlace.latitude),
+                                tuple.get(qPlace.longitude)
+                        ),
+                        tuple.get(qSchedule.startTime),
+                        tuple.get(qSchedule.endTime)
+                );
+
+                dayMap.get(dayId).getSchedules().add(scheduleResponse);
+            }
+        }
+
+        // TravelPlanResponse에 TravelDayResponse 목록 설정
+        travelPlan.setDays(new ArrayList<>(dayMap.values()));
+
+        return travelPlan;
+    }
 
     /**
      * 여행 계획과 관련된 모든 데이터를 배치로 삽입
