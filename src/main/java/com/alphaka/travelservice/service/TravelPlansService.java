@@ -4,6 +4,7 @@ import com.alphaka.travelservice.client.UserClient;
 import com.alphaka.travelservice.common.dto.CurrentUser;
 import com.alphaka.travelservice.common.dto.UserDTO;
 import com.alphaka.travelservice.dto.request.*;
+import com.alphaka.travelservice.dto.response.TravelPlanListResponse;
 import com.alphaka.travelservice.dto.response.TravelPlanResponse;
 import com.alphaka.travelservice.entity.*;
 import com.alphaka.travelservice.exception.custom.InvalidTravelDayException;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,6 +37,43 @@ public class TravelPlansService {
     private final ParticipantsRepository participantsRepository;
     private final ParticipantService participantService;
     private final TravelPlacesRepository travelPlacesRepository;
+
+    /**
+     * 여행 계획 목록 조회
+     * @param currentUser - 현재 사용자 정보
+     * @return List<TravelPlanListResponse> - 여행 계획 목록
+     */
+    public List<TravelPlanListResponse> getTravelPlanList(CurrentUser currentUser) {
+        log.info("여행 계획 목록 조회 시작. 현재 사용자: {}", currentUser.getNickname());
+
+        // 여행 계획 목록 조회
+        List<TravelPlanListResponse> travelPlanList = travelPlansRepository.getTravelPlanList(currentUser.getUserId());
+
+        // 여행 동행자 ID 목록 가져오기
+        Set<Long> allParticipantIds = travelPlanList.stream()
+                .flatMap(plan -> plan.getParticipants().stream())
+                .map(Long::valueOf) // 임시로 ID를 문자열로 저장했으므로 Long으로 변환
+                .collect(Collectors.toSet());
+
+        if (!allParticipantIds.isEmpty()) {
+            // 동행자 정보 가져오기
+            List<UserDTO> participantsInfo = userClient.getUsersById(allParticipantIds).getData();
+
+            // ID와 닉네임 매핑
+            Map<Long, String> participantIdToNickname = participantsInfo.stream()
+                    .collect(Collectors.toMap(UserDTO::getUserId, UserDTO::getNickname));
+
+            // TravelPlanListResponse의 participants 리스트를 닉네임으로 변환
+            for (TravelPlanListResponse plan : travelPlanList) {
+                List<String> nicknames = plan.getParticipants().stream()
+                        .map(idStr -> participantIdToNickname.getOrDefault(Long.valueOf(idStr), "Unknown"))
+                        .collect(Collectors.toList());
+                plan.setParticipants(nicknames);
+            }
+        }
+
+        return travelPlanList;
+    }
 
     /**
      * 여행 계획 상세 조회
@@ -146,7 +185,7 @@ public class TravelPlansService {
      * @param travelId - 여행 계획 ID
      */
     @Transactional
-    public Long deleteTravelPlan(CurrentUser currentUser, Long travelId) {
+    public void deleteTravelPlan(CurrentUser currentUser, Long travelId) {
         // 여행 계획 조회
         TravelPlans travelPlan = travelPlansRepository.findById(travelId)
                 .orElseThrow(PlanNotFoundException::new);
@@ -159,8 +198,6 @@ public class TravelPlansService {
 
         // 여행 계획 삭제
         travelPlansRepository.delete(travelPlan);
-
-        return travelId;
     }
 
     /**

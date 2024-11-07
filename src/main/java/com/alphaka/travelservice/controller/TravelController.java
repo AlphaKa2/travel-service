@@ -4,11 +4,14 @@ import com.alphaka.travelservice.common.dto.CurrentUser;
 import com.alphaka.travelservice.common.response.ApiResponse;
 import com.alphaka.travelservice.dto.request.TravelPlanCreateRequest;
 import com.alphaka.travelservice.dto.request.TravelPlanUpdateRequest;
+import com.alphaka.travelservice.dto.response.TravelPlanListResponse;
 import com.alphaka.travelservice.dto.response.TravelPlanResponse;
 import com.alphaka.travelservice.service.TravelPlansService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/travels")
@@ -34,7 +37,14 @@ public class TravelController {
 
     /**
      * 여행 계획 목록 조회
+     * @param currentUser - 현재 사용자 정보
+     * @return ApiResponse<List<TravelPlanListResponse>> - 여행 계획 목록
      */
+    @GetMapping("/all")
+    public ApiResponse<List<TravelPlanListResponse>> listTravel(CurrentUser currentUser) {
+        List<TravelPlanListResponse> response = travelPlansService.getTravelPlanList(currentUser);
+        return new ApiResponse<>(response);
+    }
 
     /**
      * 여행 계획 상세 조회
@@ -66,49 +76,13 @@ public class TravelController {
 
     /**
      * 여행 계획 삭제
+     * @param currentUser - 현재 사용자 정보
+     * @param travelId - 여행 계획 ID
      */
     @DeleteMapping("/{travelId}")
-    public ApiResponse<Long> deleteTravelPlan(CurrentUser currentUser,
+    public ApiResponse<Void> deleteTravelPlan(CurrentUser currentUser,
                                               @PathVariable("travelId") Long travelId) {
-        Long response = travelPlansService.deleteTravelPlan(currentUser, travelId);
-        return new ApiResponse<>(response);
+        travelPlansService.deleteTravelPlan(currentUser, travelId);
+        return new ApiResponse<>(null);
     }
-
-//    @GetMapping("/travels/{travelId}")
-//        public ApiResponse<TravelReadRequest> readTravel(CurrentUser currentUser, @PathVariable("travelId") Long travelId) {
-//        TravelReadRequest response = travelPlansService.readTravelPlan(currentUser, travelId);
-//        return new ApiResponse<>(response);
-//    }
-//
-//    @GetMapping("/travels")
-//    public ApiResponse<List<TravelListDTO>> listTravel(CurrentUser currentUser) {
-//        List<TravelListDTO> response = travelPlansService.listTravelPlan(currentUser);
-//        return new ApiResponse<>(response);
-//    }
-//
-//
-
-//
-//    @DeleteMapping("/travels/{travelId}")
-//    public ApiResponse<Long> deleteTravelById(CurrentUser currentUser, @PathVariable("travelId") Long travelId) {
-//        Long response = travelPlansService.deleteTravelPlan(currentUser, travelId);
-//        return new ApiResponse<>(response);
-//    }
-
-//    @PostMapping("/travels/convert/{recommendation_trip_id}")
-//    public ApiResponse<Long> convertTravel(CurrentUser currentUser, @PathVariable("recommendation_trip_id") String recommendation_trip_id) {
-//        // Fetch recommendation data from AI service using Feign Client
-//        ApiResponse<TravelPlanCreateRequest> recommendationResponse = aiClient.findTravelById(recommendation_trip_id);
-//
-//        // Ensure that the response contains data
-//        if (recommendationResponse == null || recommendationResponse.getData() == null) {
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Recommendation plan not found");
-//        }
-//
-//        // Call the service to convert and save the travel plan
-//        Long response = travelPlansService.convertTravelPlan(currentUser, recommendationResponse.getData());
-//
-//        return new ApiResponse<>(response);
-//    }
-
 }
