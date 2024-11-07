@@ -36,6 +36,7 @@ public enum ErrorCode {
     // Travel
     PLAN_NOT_FOUND(404, "PLN001", "존재하지 않는 여행입니다."),
     INVALID_TRAVEL_DAY(400, "PLN002", "여행 일자가 올바르지 않습니다."),
+    INVALID_TRAVEL_STATUS(400, "PLN003", "여행 상태가 올바르지 않습니다."),
 
     // Participant
     PARTICIPANT_NOT_FOUND(404, "PAL001", "존재하지 않는 참여 정보 입니다."),
