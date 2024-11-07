@@ -67,6 +67,12 @@ public class TravelController {
     /**
      * 여행 계획 삭제
      */
+    @DeleteMapping("/{travelId}")
+    public ApiResponse<Long> deleteTravelPlan(CurrentUser currentUser,
+                                              @PathVariable("travelId") Long travelId) {
+        Long response = travelPlansService.deleteTravelPlan(currentUser, travelId);
+        return new ApiResponse<>(response);
+    }
 
 //    @GetMapping("/travels/{travelId}")
 //        public ApiResponse<TravelReadRequest> readTravel(CurrentUser currentUser, @PathVariable("travelId") Long travelId) {
