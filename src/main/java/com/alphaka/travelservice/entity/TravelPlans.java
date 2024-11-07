@@ -55,11 +55,17 @@ public class TravelPlans {
     @OneToMany(mappedBy = "travelPlans", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Invitations> invitations = new ArrayList<>();
 
+    // 여행 계획을 업데이트
     public void updateTravelPlans(String travelName, String description, LocalDate startDate, LocalDate endDate, Long lastUpdatedBy) {
         this.travelName = travelName;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
         this.lastUpdatedBy = lastUpdatedBy;
+    }
+
+    // 여행 계획의 상태를 변경
+    public void changeTravelStatus(TravelStatus travelStatus) {
+        this.travelStatus = travelStatus;
     }
 }
