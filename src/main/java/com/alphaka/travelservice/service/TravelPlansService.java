@@ -8,6 +8,7 @@ import com.alphaka.travelservice.dto.response.TravelPlanListResponse;
 import com.alphaka.travelservice.dto.response.TravelPlanResponse;
 import com.alphaka.travelservice.entity.*;
 import com.alphaka.travelservice.exception.custom.InvalidTravelDayException;
+import com.alphaka.travelservice.exception.custom.InvalidTravelStatusException;
 import com.alphaka.travelservice.exception.custom.PlanNotFoundException;
 import com.alphaka.travelservice.exception.custom.UnauthorizedException;
 import com.alphaka.travelservice.repository.ParticipantsRepository;
@@ -198,6 +199,35 @@ public class TravelPlansService {
 
         // 여행 계획 삭제
         travelPlansRepository.delete(travelPlan);
+    }
+
+    /**
+     * 여행 계획의 상태 업데이트
+     * @param currentUser - 현재 사용자 정보
+     * @param travelId - 여행 계획 ID
+     * @param status - 업데이트할 여행 계획 상태
+     */
+    @Transactional
+    public void updateTravelPlanStatus(CurrentUser currentUser, Long travelId, String status) {
+        log.info("여행 계획 상태 업데이트 시작. 현재 사용자: {}, 여행 계획 ID: {}, 상태: {}", currentUser.getNickname(), travelId, status);
+
+        // 여행 계획을 생성한 사용자인지 확인
+        TravelPlans travelPlan = travelPlansRepository.findById(travelId)
+                .orElseThrow(PlanNotFoundException::new);
+        if (!travelPlan.getUserId().equals(currentUser.getUserId())) {
+            log.warn("사용자에게 상태 업데이트 권한이 없습니다. 사용자: {}, 여행 계획 ID: {}", currentUser.getNickname(), travelId);
+            throw new UnauthorizedException();
+        }
+
+        // 상태 검증
+        if (!TravelStatus.valueOf(status).equals(TravelStatus.PLANNED) &&
+            !TravelStatus.valueOf(status).equals(TravelStatus.COMPLETED)) {
+            log.warn("유효하지 않은 여행 계획 상태입니다. 상태: {}", status);
+            throw new InvalidTravelStatusException();
+        }
+
+        // 여행 계획 상태 업데이트
+        travelPlan.changeTravelStatus(TravelStatus.valueOf(status));
     }
 
     /**

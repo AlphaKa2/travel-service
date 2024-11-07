@@ -85,4 +85,18 @@ public class TravelController {
         travelPlansService.deleteTravelPlan(currentUser, travelId);
         return new ApiResponse<>(null);
     }
+
+    /**
+     * 여행 계획의 상태 업데이트
+     * @param currentUser - 현재 사용자 정보
+     * @param travelId - 여행 계획 ID
+     * @param status - 업데이트할 여행 계획 상태
+     */
+    @PutMapping("/{travelId}/status")
+    public ApiResponse<Void> updateTravelPlanStatus(CurrentUser currentUser,
+                                                    @PathVariable("travelId") Long travelId,
+                                                    @RequestParam("status") String status) {
+        travelPlansService.updateTravelPlanStatus(currentUser, travelId, status);
+        return new ApiResponse<>(null);
+    }
 }
