@@ -141,6 +141,29 @@ public class TravelPlansService {
     }
 
     /**
+     * 여행 계획 삭제
+     * @param currentUser - 현재 사용자 정보
+     * @param travelId - 여행 계획 ID
+     */
+    @Transactional
+    public Long deleteTravelPlan(CurrentUser currentUser, Long travelId) {
+        // 여행 계획 조회
+        TravelPlans travelPlan = travelPlansRepository.findById(travelId)
+                .orElseThrow(PlanNotFoundException::new);
+
+        // 사용자 삭제 권한 확인
+        if (!travelPlan.getUserId().equals(currentUser.getUserId())) {
+            log.warn("사용자에게 삭제 권한이 없습니다. 사용자: {}, 여행 계획 ID: {}", currentUser.getNickname(), travelId);
+            throw new UnauthorizedException();
+        }
+
+        // 여행 계획 삭제
+        travelPlansRepository.delete(travelPlan);
+
+        return travelId;
+    }
+
+    /**
      * 여행 일자 업데이트
      * @param existingTravelPlan - 기존 여행 계획 엔티티
      * @param request - 여행 계획 업데이트 요청
