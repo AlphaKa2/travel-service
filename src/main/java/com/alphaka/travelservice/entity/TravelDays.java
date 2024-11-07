@@ -2,11 +2,12 @@ package com.alphaka.travelservice.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,6 +28,18 @@ public class TravelDays {
     private LocalDate date;
 
     @OneToMany(mappedBy = "travelDays", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TravelSchedules> travelSchedules;
+    private List<TravelSchedules> travelSchedules = new ArrayList<>();
 
+    public void updateTravelDays(TravelPlans travelPlans, int dayNumber, LocalDate date) {
+        this.travelPlans = travelPlans;
+        this.dayNumber = dayNumber;
+        this.date = date;
+    }
+
+    @Builder
+    public TravelDays(TravelPlans travelPlans, int dayNumber, LocalDate date) {
+        this.travelPlans = travelPlans;
+        this.dayNumber = dayNumber;
+        this.date = date;
+    }
 }

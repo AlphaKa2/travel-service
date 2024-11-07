@@ -2,12 +2,9 @@ package com.alphaka.travelservice.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.time.LocalDateTime;
-import java.math.BigDecimal;
 
 @Entity
 @Getter
@@ -19,7 +16,7 @@ public class TravelPlaces {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long placeId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_id")
     private TravelSchedules travelSchedules;
 
@@ -27,5 +24,22 @@ public class TravelPlaces {
     private String address;
     private String latitude;
     private String longitude;
+
+    @Builder
+    public TravelPlaces(TravelSchedules travelSchedules, String placeName, String address, String latitude, String longitude) {
+        this.travelSchedules = travelSchedules;
+        this.placeName = placeName;
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
+    public void updateTravelPlaces(TravelSchedules travelSchedules, String placeName, String address, String latitude, String longitude) {
+        this.travelSchedules = travelSchedules;
+        this.placeName = placeName;
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 }
 

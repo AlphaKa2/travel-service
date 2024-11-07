@@ -1,39 +1,49 @@
-//package com.alphaka.travelservice.service;
-//
-//import com.alphaka.travelservice.client.UserClient;
-//import com.alphaka.travelservice.common.dto.CurrentUser;
-//import com.alphaka.travelservice.common.dto.UserDTO;
-//import com.alphaka.travelservice.common.response.ApiResponse;
-//import com.alphaka.travelservice.dto.request.ParticipantChangeRequest;
-//import com.alphaka.travelservice.dto.request.ParticipantRequest;
-//import com.alphaka.travelservice.dto.response.ParticipantListDTO;
-//import com.alphaka.travelservice.entity.Participants;
-//import com.alphaka.travelservice.entity.Permission;
-//import com.alphaka.travelservice.entity.TravelPlans;
-//import com.alphaka.travelservice.exception.custom.InvitationNotFoundException;
-//import com.alphaka.travelservice.exception.custom.PlanNotFoundException;
-//import com.alphaka.travelservice.repository.ParticipantsRepository;
-//import com.alphaka.travelservice.repository.travel.TravelPlansRepository;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import java.time.LocalDateTime;
-//import java.util.List;
-//import java.util.stream.Collectors;
-//
-//@Slf4j
-//@Service
-//@RequiredArgsConstructor
-//@Transactional(readOnly = true)
-//public class ParticipantService {
-//
-//    private final UserClient userClient;
-//    private final TravelPlansRepository travelPlansRepository;
-//    private final ParticipantsRepository participantsRepository;
-//
-//
+package com.alphaka.travelservice.service;
+
+import com.alphaka.travelservice.entity.Participants;
+import com.alphaka.travelservice.entity.Permission;
+import com.alphaka.travelservice.entity.TravelPlans;
+import com.alphaka.travelservice.exception.custom.PlanNotFoundException;
+import com.alphaka.travelservice.repository.ParticipantsRepository;
+import com.alphaka.travelservice.repository.travel.TravelPlansRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class ParticipantService {
+
+    private final TravelPlansRepository travelPlansRepository;
+    private final ParticipantsRepository participantsRepository;
+
+    /**
+     * 여행 계획 생성시 자신을 동행자로 추가
+     * @param userId - 사용자 ID
+     * @param travelId - 여행 계획 ID
+     */
+    @Transactional
+    public void addSelfParticipant(Long userId, Long travelId) {
+        log.info("자신이 생성한 여행 계획에 동행자로 등록 userId: {}, travelId: {}", userId, travelId);
+
+        // 여행 계획 조회
+        TravelPlans travelPlan = travelPlansRepository.findById(travelId).orElseThrow(PlanNotFoundException::new);
+
+        // 동행자 추가
+        Participants participants = Participants.builder()
+                .userId(userId)
+                .travelPlans(travelPlan)
+                .permission(Permission.EDIT)
+                .build();
+
+        participantsRepository.save(participants);
+        log.info("동행자 추가 완료");
+    }
+
+
 //    @Transactional
 //    public Long addParticipant(CurrentUser currentUser, ParticipantRequest request) {
 //        // Step 1: Retrieve user information by nickname
@@ -115,4 +125,4 @@
 //        // Return the ID of the deleted participant
 //        return participantId;
 //    }
-//}
+}

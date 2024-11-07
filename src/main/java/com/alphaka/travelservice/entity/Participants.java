@@ -2,9 +2,10 @@ package com.alphaka.travelservice.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -27,5 +28,13 @@ public class Participants {
     @Enumerated(EnumType.STRING)
     private Permission permission = Permission.VIEW;
 
+    @CreationTimestamp
     private LocalDateTime joinedAt;
+
+    @Builder
+    public Participants(TravelPlans travelPlans, Long userId, Permission permission) {
+        this.travelPlans = travelPlans;
+        this.userId = userId;
+        this.permission = permission;
+    }
 }

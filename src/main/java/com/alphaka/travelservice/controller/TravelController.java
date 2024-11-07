@@ -3,13 +3,11 @@ package com.alphaka.travelservice.controller;
 import com.alphaka.travelservice.common.dto.CurrentUser;
 import com.alphaka.travelservice.common.response.ApiResponse;
 import com.alphaka.travelservice.dto.request.TravelPlanCreateRequest;
+import com.alphaka.travelservice.dto.request.TravelPlanUpdateRequest;
 import com.alphaka.travelservice.service.TravelPlansService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/travels")
@@ -43,13 +41,18 @@ public class TravelController {
 
     /**
      * 여행 계획 수정
+     * @param currentUser - 현재 사용자 정보
+     * @param travelId - 여행 계획 ID
+     * @param request - 여행 계획 수정 요청
+     * @return ApiResponse<Long> - 수정된 여행 계획 ID
      */
-//    @PutMapping("/travels")
-//    public ApiResponse<Long> updateTravelByDTO(CurrentUser currentUser,
-//                                               @Valid @RequestBody TravelUpdateRequest request) {
-//        Long response = travelPlansService.updateTravelPlan(currentUser, request);
-//        return new ApiResponse<>(response);
-//    }
+    @PutMapping("/{travelId}")
+    public ApiResponse<Long> updateTravelPlan(CurrentUser currentUser,
+                                              @PathVariable("travelId") Long travelId,
+                                              @Valid @RequestBody TravelPlanUpdateRequest request) {
+        Long response = travelPlansService.updateTravelPlan(currentUser, travelId, request);
+        return new ApiResponse<>(response);
+    }
 
     /**
      * 여행 계획 삭제
