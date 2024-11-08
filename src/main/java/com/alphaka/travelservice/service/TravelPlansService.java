@@ -7,10 +7,7 @@ import com.alphaka.travelservice.dto.request.*;
 import com.alphaka.travelservice.dto.response.TravelPlanListResponse;
 import com.alphaka.travelservice.dto.response.TravelPlanResponse;
 import com.alphaka.travelservice.entity.*;
-import com.alphaka.travelservice.exception.custom.InvalidTravelDayException;
-import com.alphaka.travelservice.exception.custom.InvalidTravelStatusException;
-import com.alphaka.travelservice.exception.custom.PlanNotFoundException;
-import com.alphaka.travelservice.exception.custom.UnauthorizedException;
+import com.alphaka.travelservice.exception.custom.*;
 import com.alphaka.travelservice.repository.ParticipantsRepository;
 import com.alphaka.travelservice.repository.travel.TravelPlacesRepository;
 import com.alphaka.travelservice.repository.travel.TravelPlansRepository;
@@ -87,11 +84,15 @@ public class TravelPlansService {
 
         // 여행 계획 조회
         TravelPlanResponse travelPlan = travelPlansRepository.getTravelPlanDetail(travelId);
-        if (travelPlan == null) throw new PlanNotFoundException();
+        if (travelPlan == null) {
+            log.warn("여행 계획을 찾을 수 없습니다. 여행 계획 ID: {}", travelId);
+            throw new PlanNotFoundException();
+        }
+
 
         // 여행 참가자 목록 id 리스트로 변환
         Set<Long> participantsList = travelPlansRepository.findById(travelId)
-                .orElseThrow(PlanNotFoundException::new)
+                .orElseThrow(ParticipantNotFoundException::new)
                 .getParticipants()
                 .stream()
                 .map(Participants::getUserId)
@@ -100,7 +101,7 @@ public class TravelPlansService {
         // 현재 사용자가 참가자 목록에 있는지 확인
         if (!participantsList.contains(currentUser.getUserId())) {
             log.warn("사용자가 여행 참가자 목록에 없습니다. 사용자: {}, 여행 계획 ID: {}", currentUser.getNickname(), travelId);
-            throw new UnauthorizedException();
+            throw new ParticipantNotFoundException();
         }
 
         // 참가자 닉네임 목록 설정
@@ -159,7 +160,7 @@ public class TravelPlansService {
 
         // 사용자 수정 권한 확인
         Participants participants = participantsRepository.findByUserIdAndTravelPlans_TravelId(currentUser.getUserId(), travelId)
-                .orElseThrow(PlanNotFoundException::new);
+                .orElseThrow(ParticipantNotFoundException::new);
         if (!participants.getPermission().equals(Permission.EDIT)) {
             log.warn("사용자에게 수정 권한이 없습니다. 사용자: {}, 여행 계획 ID: {}", currentUser.getNickname(), travelId);
             throw new UnauthorizedException();
@@ -249,7 +250,7 @@ public class TravelPlansService {
                 TravelDays existingDay = existingTravelPlan.getTravelDays().stream()
                         .filter(day -> day.getDayId().equals(dayRequest.getTravelDayId()))
                         .findFirst()
-                        .orElseThrow(PlanNotFoundException::new);
+                        .orElseThrow(InvalidTravelDayException::new);
                 updateExistingDay(existingDay, existingTravelPlan, dayRequest);
             } else {
                 // 새로운 일자 추가
@@ -315,7 +316,7 @@ public class TravelPlansService {
                 TravelSchedules existingSchedule = existingDay.getTravelSchedules().stream()
                                 .filter(schedule -> schedule.getScheduleId().equals(scheduleRequest.getTravelScheduleId()))
                                 .findFirst()
-                                .orElseThrow(PlanNotFoundException::new);
+                                .orElseThrow(InvalidTravelScheduleException::new);
                 existingSchedule.updateTravelSchedules(
                         existingDay,
                         scheduleRequest.getOrder(),
@@ -405,7 +406,7 @@ public class TravelPlansService {
 
             // 장소가 현재 스케줄과 연결되어 있는지 확인
             if (!existingPlace.getTravelSchedules().equals(travelSchedule)) {
-                throw new PlanNotFoundException();
+                throw new InvalidTravelScheduleException();
             }
 
             // 장소 정보 업데이트
