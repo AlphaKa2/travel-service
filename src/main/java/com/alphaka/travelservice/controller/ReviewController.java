@@ -2,14 +2,12 @@ package com.alphaka.travelservice.controller;
 
 import com.alphaka.travelservice.common.dto.CurrentUser;
 import com.alphaka.travelservice.common.response.ApiResponse;
+import com.alphaka.travelservice.dto.request.ReviewDetailRequest;
 import com.alphaka.travelservice.dto.response.ReviewPlaceResponse;
 import com.alphaka.travelservice.service.ReviewService;
-
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,5 +29,19 @@ public class ReviewController {
                                                                  @PathVariable("travelId") Long travelId) {
         List<ReviewPlaceResponse> reviewPlace = reviewService.getReviewPlaces(currentUser, travelId);
         return new ApiResponse<>(reviewPlace);
+    }
+
+    /**
+     * 여행 리뷰 작성
+     * @param currentUser - 현재 사용자
+     * @param travelId - 여행 계획 ID
+     * @param reviewDetails - 여행 리뷰 상세 정보
+     */
+    @PostMapping("/{travelId}/reviews")
+    public ApiResponse<Void> createReview(CurrentUser currentUser,
+                                          @PathVariable("travelId") Long travelId,
+                                          @Valid @RequestBody List<ReviewDetailRequest> reviewDetails) {
+        reviewService.createReview(currentUser, travelId, reviewDetails);
+        return new ApiResponse<>();
     }
 }

@@ -1,6 +1,7 @@
 package com.alphaka.travelservice.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,4 +30,11 @@ public class Review {
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewDetail> reviewDetails = new ArrayList<>();
+
+    @Builder
+    public Review(TravelPlans travelPlans, Long preferenceId, Long userId) {
+        this.travelPlans = travelPlans;
+        this.preferenceId = preferenceId;
+        this.userId = userId;
+    }
 }
