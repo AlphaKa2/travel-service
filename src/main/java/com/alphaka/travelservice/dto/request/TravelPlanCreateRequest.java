@@ -26,6 +26,9 @@ public class TravelPlanCreateRequest {
     @NotNull
     private TravelType travelType;
 
+    @NotNull
+    private Long preferenceId;
+
     @NotNull(message = "여행 시작일을 입력해주세요.")
     private LocalDate startDate;
 

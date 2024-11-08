@@ -225,8 +225,9 @@ public class TravelPlansRepositoryImpl implements TravelPlansRepositoryCustom {
      * @return Long - 생성된 travel_id
      */
     private Long insertTravelPlan(Long userId, TravelPlanCreateRequest request) {
-        String sql = "INSERT INTO travel_plans (user_id, travel_name, description, travel_type, start_date, end_date, travel_status, last_updated_by, created_at) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+        String sql = "INSERT INTO travel_plans (user_id, travel_name, description, preference_id, travel_type, start_date, " +
+                "                               end_date, travel_status, last_updated_by, created_at) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -235,11 +236,12 @@ public class TravelPlansRepositoryImpl implements TravelPlansRepositoryCustom {
             ps.setLong(1, userId);
             ps.setString(2, request.getTravelName());
             ps.setString(3, request.getDescription());
-            ps.setString(4, request.getTravelType().name());
-            ps.setDate(5, Date.valueOf(request.getStartDate()));
-            ps.setDate(6, Date.valueOf(request.getEndDate()));
-            ps.setString(7, "PLANNED");
-            ps.setLong(8, userId);
+            ps.setLong(4, request.getPreferenceId());
+            ps.setString(5, request.getTravelType().name());
+            ps.setDate(6, Date.valueOf(request.getStartDate()));
+            ps.setDate(7, Date.valueOf(request.getEndDate()));
+            ps.setString(8, "PLANNED");
+            ps.setLong(9, userId);
             return ps;
         }, keyHolder);
 
