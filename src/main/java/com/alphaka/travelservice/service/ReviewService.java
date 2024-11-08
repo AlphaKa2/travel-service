@@ -106,6 +106,7 @@ public class ReviewService {
                     .travelPlaces(travelPlace)
                     .rating(reviewDetailRequest.getRating())
                     .build();
+            review.addReviewDetail(reviewDetail);
         });
 
         // 리뷰 저장

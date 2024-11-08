@@ -37,4 +37,9 @@ public class Review {
         this.preferenceId = preferenceId;
         this.userId = userId;
     }
+
+    public void addReviewDetail(ReviewDetail reviewDetail) {
+        reviewDetails.add(reviewDetail);
+        reviewDetail.setReview(this);
+    }
 }

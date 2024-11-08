@@ -35,4 +35,8 @@ public class ReviewDetail {
         this.travelPlaces = travelPlaces;
         this.rating = rating;
     }
+
+    public void setReview(Review review) {
+        this.review = review;
+    }
 }
