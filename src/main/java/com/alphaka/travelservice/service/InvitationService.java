@@ -8,6 +8,7 @@ import com.alphaka.travelservice.dto.request.InvitationDTO;
 import com.alphaka.travelservice.dto.request.ParticipantRequest;
 import com.alphaka.travelservice.dto.response.InvitationListDTO;
 import com.alphaka.travelservice.entity.*;
+import com.alphaka.travelservice.exception.custom.DuplicateInvitationException;
 import com.alphaka.travelservice.exception.custom.InvitationAccessException;
 import com.alphaka.travelservice.exception.custom.PlanNotFoundException;
 import com.alphaka.travelservice.exception.custom.InvitationNotFoundException;
@@ -60,6 +61,12 @@ public class InvitationService {
         // 여행지 권한 확인
         if (!currentUser.getUserId().equals(travelPlan.getUserId())) {
             throw new InvitationAccessException();
+        }
+
+        // 중복 초대 확인
+        boolean isDuplicate = invitationsRepository.existsByUserIdAndTravelPlans(userId, travelPlan);
+        if (isDuplicate) {
+            throw new DuplicateInvitationException();
         }
 
         // 동행자 초대 생성
