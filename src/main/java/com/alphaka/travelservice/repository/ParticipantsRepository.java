@@ -13,4 +13,6 @@ public interface ParticipantsRepository extends JpaRepository<Participants, Long
     Optional<Participants> findByUserIdAndTravelPlans_TravelId(Long userId, Long travelId);
 
     List<Participants> findByTravelPlans_TravelId(Long travelId);
+
+    boolean existsByUserIdAndTravelPlans_TravelId(Long userId, Long travelId);
 }

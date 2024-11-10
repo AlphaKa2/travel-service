@@ -1,10 +1,9 @@
 package com.alphaka.travelservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -29,10 +28,22 @@ public class Invitations {
     @Enumerated(EnumType.STRING)
     private InvitationStatus status = InvitationStatus.PENDING;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column(nullable = true)
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    // Getters and Setters
+    @Builder
+    public Invitations (TravelPlans travelPlans, Long userId, String invitationMessage) {
+        this.travelPlans = travelPlans;
+        this.userId = userId;
+        this.invitationMessage = invitationMessage;
+        this.status = InvitationStatus.PENDING;
+    }
+
+    public void changeInvitationStatus (InvitationStatus status) {
+        this.status = status;
+    }
+
 }
