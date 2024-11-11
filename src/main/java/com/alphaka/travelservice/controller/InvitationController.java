@@ -5,6 +5,7 @@ import com.alphaka.travelservice.common.response.ApiResponse;
 import com.alphaka.travelservice.dto.request.InvitationDTO;
 import com.alphaka.travelservice.dto.request.ParticipantRequest;
 import com.alphaka.travelservice.dto.response.InvitationListDTO;
+import com.alphaka.travelservice.dto.response.InvitedListDTO;
 import com.alphaka.travelservice.service.InvitationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,13 @@ public class InvitationController {
     public ApiResponse<Long> accessInvitationByNick(CurrentUser currentUser, @Valid @RequestBody InvitationDTO request) {
 
         Long response = invitationService.changeInvitation(currentUser, request);
+        return new ApiResponse<>(response);
+    }
+
+    @GetMapping("/{travelId}")
+    public ApiResponse<List<InvitedListDTO>> listInvitedByTravelId(CurrentUser currentUser, @PathVariable Long travelId) {
+
+        List<InvitedListDTO> response = invitationService.getInvited(currentUser, travelId);
         return new ApiResponse<>(response);
     }
 }

@@ -7,6 +7,7 @@ import com.alphaka.travelservice.common.response.ApiResponse;
 import com.alphaka.travelservice.dto.request.InvitationDTO;
 import com.alphaka.travelservice.dto.request.ParticipantRequest;
 import com.alphaka.travelservice.dto.response.InvitationListDTO;
+import com.alphaka.travelservice.dto.response.InvitedListDTO;
 import com.alphaka.travelservice.entity.*;
 import com.alphaka.travelservice.exception.custom.DuplicateInvitationException;
 import com.alphaka.travelservice.exception.custom.InvitationAccessException;
@@ -139,5 +140,53 @@ public class InvitationService {
         log.info("사용자 초대 상태 변경 완료");
 
         return invitation.getInvitationId();
+    }
+
+    /**
+     * 초대한 사용자 목록 조회
+     * @param currentUser
+     * @param travelId
+     * @return InvitedListDTO - 초대한 사용자 목록 정보
+     */
+    public List<InvitedListDTO> getInvited(CurrentUser currentUser, Long travelId) {
+
+        // 여행지 정보 조회
+        TravelPlans travelPlan = (TravelPlans) travelPlansRepository.findById(travelId)
+                .orElseThrow(() -> new PlanNotFoundException());
+
+        // 여행지 권한 확인
+        if (!currentUser.getUserId().equals(travelPlan.getUserId())) {
+            throw new InvitationAccessException();
+        }
+
+        // Q 클래스 인스턴스 가져오기
+        QInvitations invitations = QInvitations.invitations;
+        QTravelPlans travelPlans = QTravelPlans.travelPlans;
+
+        // QueryDSL을 사용한 쿼리
+        List<Invitations> result = queryFactory.selectFrom(invitations)
+                .join(invitations.travelPlans, travelPlans).fetchJoin()
+                .where(travelPlans.travelId.eq(travelId)) // Match invitations by travelId
+                .fetch();
+
+        // DTO로 매핑
+        List<InvitedListDTO> invitedDTOs = result.stream()
+                .map(invitation -> {
+                    // Call FeignClient to get user information by ID
+                    ApiResponse<UserDTO> userResponse = userClient.findUserById(invitation.getUserId());
+                    UserDTO userDTO = userResponse.getData();
+
+                    return InvitedListDTO.builder()
+                            .travelId(invitation.getTravelPlans().getTravelId())
+                            .invitationId(invitation.getInvitationId())
+                            .invitationMessage(invitation.getInvitationMessage())
+                            .invitationStatus(invitation.getStatus())
+                            .nickname(userDTO.getNickname()) // Use data from UserDTO
+                            .userId(userDTO.getUserId()) // Include userId from UserDTO if needed
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return invitedDTOs;
     }
 }
