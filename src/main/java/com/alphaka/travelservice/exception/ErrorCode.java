@@ -20,7 +20,11 @@ public enum ErrorCode {
     INVALID_TRAVEL_STATUS(400, "TRV004", "여행 상태가 올바르지 않습니다."),
     REVIEW_ALREADY_WRITTEN(400, "TRV005", "이미 리뷰를 작성한 여행입니다."),
     PARTICIPANT_NOT_FOUND(404, "TRV006", "존재하지 않는 참여 정보 입니다."),
-    INVITATION_NOT_FOUND(404, "TRV007", "존재하지 않는 초대자 정보 입니다.");
+    INVITATION_NOT_FOUND(404, "TRV007", "존재하지 않는 초대자 정보 입니다."),
+    PARTICIPANT_NOT_ACCESS(401, "TRV008", "해당 여행지에 대한 권한이 없습니다."),
+    INVITATION_NOT_ACCESS(401, "TRV009", "해당 여행지에 대한 초대 권한이 없습니다."),
+
+    INVITATION_DUPLICATE(400, "TRV010", "이미 초대한 사용자 입니다.");
 
     private final int status;
     private final String code;

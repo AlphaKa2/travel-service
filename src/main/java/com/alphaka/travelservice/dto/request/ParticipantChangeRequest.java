@@ -12,8 +12,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ParticipantChangeRequest {
     private Long participantId;
-    private Long travelId;
-    private Long userId;
-    private String nickname;
     private Permission permission;
 }

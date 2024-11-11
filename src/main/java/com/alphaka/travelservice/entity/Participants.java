@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -35,6 +36,10 @@ public class Participants {
     public Participants(TravelPlans travelPlans, Long userId, Permission permission) {
         this.travelPlans = travelPlans;
         this.userId = userId;
+        this.permission = permission;
+    }
+
+    public void changeParticipantPermission(Permission permission) {
         this.permission = permission;
     }
 }
