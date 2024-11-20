@@ -1,4 +1,4 @@
-package com.alphaka.travelservice.repository;
+package com.alphaka.travelservice.repository.invitation;
 
 import com.alphaka.travelservice.entity.Invitations;
 import com.alphaka.travelservice.entity.TravelPlans;
