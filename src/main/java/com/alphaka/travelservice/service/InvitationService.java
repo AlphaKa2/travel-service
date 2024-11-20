@@ -13,7 +13,7 @@ import com.alphaka.travelservice.exception.custom.DuplicateInvitationException;
 import com.alphaka.travelservice.exception.custom.InvitationAccessException;
 import com.alphaka.travelservice.exception.custom.PlanNotFoundException;
 import com.alphaka.travelservice.exception.custom.InvitationNotFoundException;
-import com.alphaka.travelservice.repository.InvitationsRepository;
+import com.alphaka.travelservice.repository.invitation.InvitationsRepository;
 import com.alphaka.travelservice.repository.travel.TravelPlansRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
