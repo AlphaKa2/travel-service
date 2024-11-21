@@ -10,7 +10,7 @@ import com.alphaka.travelservice.entity.*;
 import com.alphaka.travelservice.exception.custom.InvitationNotFoundException;
 import com.alphaka.travelservice.exception.custom.ParticipantAccessException;
 import com.alphaka.travelservice.exception.custom.PlanNotFoundException;
-import com.alphaka.travelservice.repository.ParticipantsRepository;
+import com.alphaka.travelservice.repository.invitation.ParticipantsRepository;
 import com.alphaka.travelservice.repository.travel.TravelPlansRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

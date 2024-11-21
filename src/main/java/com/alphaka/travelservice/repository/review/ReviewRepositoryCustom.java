@@ -1,4 +1,4 @@
-package com.alphaka.travelservice.repository;
+package com.alphaka.travelservice.repository.review;
 
 import com.alphaka.travelservice.dto.response.ReviewPlaceResponse;
 import org.springframework.stereotype.Repository;

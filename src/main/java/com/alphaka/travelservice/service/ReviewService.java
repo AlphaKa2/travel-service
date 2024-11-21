@@ -1,12 +1,18 @@
 package com.alphaka.travelservice.service;
 
+import com.alphaka.travelservice.client.AiClient;
 import com.alphaka.travelservice.common.dto.CurrentUser;
 import com.alphaka.travelservice.dto.request.ReviewDetailRequest;
+import com.alphaka.travelservice.dto.response.PreferenceResponse;
 import com.alphaka.travelservice.dto.response.ReviewPlaceResponse;
 import com.alphaka.travelservice.entity.*;
-import com.alphaka.travelservice.exception.custom.*;
-import com.alphaka.travelservice.repository.ParticipantsRepository;
-import com.alphaka.travelservice.repository.ReviewRepository;
+import com.alphaka.travelservice.exception.custom.InvalidTravelStatusException;
+import com.alphaka.travelservice.exception.custom.ParticipantNotFoundException;
+import com.alphaka.travelservice.exception.custom.PlanNotFoundException;
+import com.alphaka.travelservice.exception.custom.ReviewAlreadyWrittenException;
+import com.alphaka.travelservice.repository.data.TravelDataRepository;
+import com.alphaka.travelservice.repository.invitation.ParticipantsRepository;
+import com.alphaka.travelservice.repository.review.ReviewRepository;
 import com.alphaka.travelservice.repository.travel.TravelPlacesRepository;
 import com.alphaka.travelservice.repository.travel.TravelPlansRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -22,6 +31,8 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class ReviewService {
 
+    private final AiClient aiClient;
+    private final TravelDataRepository travelDataRepository;
     private final ParticipantsRepository participantsRepository;
     private final ReviewRepository reviewRepository;
     private final TravelPlansRepository travelPlansRepository;
@@ -112,5 +123,72 @@ public class ReviewService {
         // 리뷰 저장
         reviewRepository.save(review);
         log.info("리뷰 저장 완료 - 리뷰 ID: {}", review.getId());
+
+        // CDC를 위한 여행 정보 처리
+        processReviewData(currentUser, travelPlans, review);
+    }
+
+    /**
+     * 리뷰 데이터를 처리하여 TravelData 생성 및 저장
+     * @param currentUser - 현재 사용자
+     * @param travelPlans - 여행 계획
+     * @param review - 리뷰
+     */
+    private void processReviewData(CurrentUser currentUser, TravelPlans travelPlans, Review review) {
+        log.info("리뷰 데이터 처리 시작 - 리뷰 ID: {}", review.getId());
+
+        // 성향 데이터 조회
+        PreferenceResponse preferenceResponse = aiClient.getPreferenceData(travelPlans.getPreferenceId()).getData();
+        log.info("성향 데이터 조회 완료 - preferenceId: {}", travelPlans.getPreferenceId());
+
+        // 평점이 3점 이상인 리뷰 상세 정보 필터링
+        List<ReviewDetail> filteredReviewDetails = review.getReviewDetails().stream()
+                .filter(reviewDetail -> reviewDetail.getRating() >= 3)
+                .collect(Collectors.toList());
+
+        if (filteredReviewDetails.isEmpty()) {
+            log.info("평점이 3점 이상인 리뷰가 없습니다. TravelData 저장을 생략합니다.");
+            return;
+        }
+
+        // 각 리뷰 상세 정보에 대해 TravelData 생성 및 저장
+        filteredReviewDetails.forEach(reviewDetail -> {
+            TravelPlaces travelPlace = reviewDetail.getTravelPlaces();
+
+            // TravelData 생성
+            TravelData travelData = TravelData.builder()
+                    .travelId(travelPlans.getTravelId())
+                    .travelerId(currentUser.getUserId())
+                    .travelPurpose(preferenceResponse.getTravelPurpose())
+                    .mvmnNm(preferenceResponse.getMvmnNm())
+                    .ageGrp(preferenceResponse.getAgeGrp())
+                    .gender(preferenceResponse.getGender())
+                    .travelStyl1(preferenceResponse.getTravelStyl1())
+                    .travelMotive1(preferenceResponse.getTravelMotive1())
+                    .travelStatusAccompany(preferenceResponse.getTravelStatusAccompany())
+                    .travelStatusDays(preferenceResponse.getTravelStatusDays())
+                    .visitAreaNm(travelPlace.getPlaceName())
+                    .roadAddr(travelPlace.getAddress())
+                    .xCoord(travelPlace.getLatitude())
+                    .yCoord(travelPlace.getLongitude())
+                    .travelStatusYmd(formatTravelStatusYmd(travelPlans.getStartDate(), travelPlans.getEndDate()))
+                    .esLoaded(0)
+                    .build();
+
+            // TravelData 저장
+            travelDataRepository.save(travelData);
+            log.info("TravelData 저장 완료 - travelDataId: {}", travelData.getTravelDataId());
+        });
+    }
+
+    /**
+     * 여행 상태를 YMD 형식으로 변환
+     * @param startDate - 여행 시작일
+     * @param endDate - 여행 종료일
+     * @return String - YMD 형식의 여행 상태
+     */
+    private String formatTravelStatusYmd(LocalDate startDate, LocalDate endDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return startDate.format(formatter) + "~" + endDate.format(formatter);
     }
 }

@@ -8,7 +8,7 @@ import com.alphaka.travelservice.dto.response.TravelPlanListResponse;
 import com.alphaka.travelservice.dto.response.TravelPlanResponse;
 import com.alphaka.travelservice.entity.*;
 import com.alphaka.travelservice.exception.custom.*;
-import com.alphaka.travelservice.repository.ParticipantsRepository;
+import com.alphaka.travelservice.repository.invitation.ParticipantsRepository;
 import com.alphaka.travelservice.repository.travel.TravelPlacesRepository;
 import com.alphaka.travelservice.repository.travel.TravelPlansRepository;
 import lombok.RequiredArgsConstructor;
