@@ -29,6 +29,11 @@ public interface UserClient {
      * @param userIds - 사용자 ID 목록
      * @return ApiResponse<List<UserDTO>> - 사용자 정보 목록
      */
-    @GetMapping("/users/{userId}/all")
-    ApiResponse<List<UserDTO>> getUsersById(@PathVariable("userId") Set<Long> userIds);
+    /**
+     * 사용자 ID 목록으로 사용자 조회 (user-service에서 결정되는 API Path에 따라 변경될 수 있음)
+     * @param userIds - 사용자 ID 목록
+     * @return ApiResponse<List<UserDTO>> - 사용자 정보 목록
+     */
+    @GetMapping("/users")
+    ApiResponse<List<UserDTO>> getUsersById(@RequestParam("userIds") Set<Long> userIds);
 }

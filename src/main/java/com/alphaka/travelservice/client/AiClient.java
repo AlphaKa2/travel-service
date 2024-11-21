@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 /**
  * 여행 추천 정보 조회를 위한 Feign Client
  */
-@FeignClient(name = "AI-SERVICE")
+@FeignClient(name = "AI-SERVICE", url="ec2-13-125-174-132.ap-northeast-2.compute.amazonaws.com:8001")
 public interface AiClient {
 
     /**
@@ -17,6 +17,6 @@ public interface AiClient {
      * @param preferenceId - 성향 ID
      * @return PreferenceResponse - 성향 정보
      */
-    @GetMapping("/preferences/{preferenceId}")
-    ApiResponse<PreferenceResponse> getPreferenceData(@PathVariable("preferenceId") Long preferenceId);
+    @GetMapping("/preferences/{preference_id}")
+    PreferenceResponse getPreferenceData(@PathVariable("preference_id") Long preferenceId);
 }

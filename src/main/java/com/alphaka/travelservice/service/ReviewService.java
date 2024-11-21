@@ -138,7 +138,7 @@ public class ReviewService {
         log.info("리뷰 데이터 처리 시작 - 리뷰 ID: {}", review.getId());
 
         // 성향 데이터 조회
-        PreferenceResponse preferenceResponse = aiClient.getPreferenceData(travelPlans.getPreferenceId()).getData();
+        PreferenceResponse preferenceResponse = aiClient.getPreferenceData(travelPlans.getPreferenceId());
         log.info("성향 데이터 조회 완료 - preferenceId: {}", travelPlans.getPreferenceId());
 
         // 평점이 3점 이상인 리뷰 상세 정보 필터링
@@ -159,14 +159,14 @@ public class ReviewService {
             TravelData travelData = TravelData.builder()
                     .travelId(travelPlans.getTravelId())
                     .travelerId(currentUser.getUserId())
-                    .travelPurpose(preferenceResponse.getTravelPurpose())
-                    .mvmnNm(preferenceResponse.getMvmnNm())
-                    .ageGrp(preferenceResponse.getAgeGrp())
+                    .travelPurpose(preferenceResponse.getPurposes())
+                    .mvmnNm(preferenceResponse.getMeans_of_transportation())
+                    .ageGrp(Integer.parseInt(preferenceResponse.getAge_group()))
                     .gender(preferenceResponse.getGender())
-                    .travelStyl1(preferenceResponse.getTravelStyl1())
-                    .travelMotive1(preferenceResponse.getTravelMotive1())
-                    .travelStatusAccompany(preferenceResponse.getTravelStatusAccompany())
-                    .travelStatusDays(preferenceResponse.getTravelStatusDays())
+                    .travelStyl1(preferenceResponse.getStyle())
+                    .travelMotive1(preferenceResponse.getMotive())
+                    .travelStatusAccompany(preferenceResponse.getTravel_companion_status())
+                    .travelStatusDays(preferenceResponse.getTravel_status_days())
                     .visitAreaNm(travelPlace.getPlaceName())
                     .roadAddr(travelPlace.getAddress())
                     .xCoord(travelPlace.getLatitude())
