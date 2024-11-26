@@ -1,19 +1,17 @@
+server:
+  port: 8004
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
 spring:
   application:
     name: travel-service
 
-  #datasource
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/travel_db?rewriteBatchedStatements=true
-    username: root
-    password: wngur9836
-
-  #redis
-#  data:
-#    redis:
-#      host: localhost
-#      port: 6379
 
   #jpa
   jpa:
@@ -25,18 +23,66 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
 
-  #security
-  profiles:
-    include: secret
+# local 프로필
+---
+
+spring:
+
+  config:
+    activate:
+      on-profile: local
+
+  cloud:
+    kubernetes:
+      enabled: false
+
+  #datasource
+  datasource:
+    url: url
+    username: username
+    password: password
+
+  #redis
+  data:
+    redis:
+      host: host
+      port: 6379
 
 # eureka
 eureka:
+  instance:
+    prefer-ip-address: true
   client:
-    enabled: true
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: url
 
-server:
-  port: 8004
+# develop 프로필
+---
+spring:
+
+  config:
+    activate:
+      on-profile: develop
+
+  #datasource
+  datasource:
+    url: '${MYSQL_URL}/travel_service'
+    username: "${MYSQL_USERNAME}"
+    password: "${MYSQL_PASSWORD}"
+    hikari:
+
+      data-source-properties:
+        rewriteBatchStatements: true
+
+  #redis
+  data:
+    redis:
+      host: "${REDIS_HOST}"
+      port: "${REDIS_PORT}"
+      password: "${REDIS_PASSWORD}"
+
+eureka:
+  client:
+    enabled: false
