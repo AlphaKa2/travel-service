@@ -9,10 +9,7 @@ import com.alphaka.travelservice.dto.request.ParticipantRequest;
 import com.alphaka.travelservice.dto.response.InvitationListDTO;
 import com.alphaka.travelservice.dto.response.InvitedListDTO;
 import com.alphaka.travelservice.entity.*;
-import com.alphaka.travelservice.exception.custom.DuplicateInvitationException;
-import com.alphaka.travelservice.exception.custom.InvitationAccessException;
-import com.alphaka.travelservice.exception.custom.PlanNotFoundException;
-import com.alphaka.travelservice.exception.custom.InvitationNotFoundException;
+import com.alphaka.travelservice.exception.custom.*;
 import com.alphaka.travelservice.repository.invitation.InvitationsRepository;
 import com.alphaka.travelservice.repository.travel.TravelPlansRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -49,11 +46,23 @@ public class InvitationService {
     public Long addInvitation(CurrentUser currentUser, ParticipantRequest request) {
 
         log.info("사용자 초대 시작. 현재 사용자: {}", currentUser.getNickname());
+
+        // 닉네임이 비어있는지 확인
+        if (request.getNickname() == null || request.getNickname().isEmpty()) {
+            throw new UserNotFoundException();
+        }
+
         // 유저 정보 조회
         ApiResponse<UserDTO> userResponse = userClient.findUserByNickname(request.getNickname());
         UserDTO userDTO = userResponse.getData();
         Long userId = userDTO.getUserId();
 
+        // userId가 없는 경우 확인
+        if (userDTO == null || userDTO.getUserId() == null) {
+            throw new UserNotFoundException();
+        }
+
+        System.out.println("Requested Travel ID: " + request.getTravelId());
         // 여행지 정보 조회
         TravelPlans travelPlan = (TravelPlans) travelPlansRepository.findById(request.getTravelId())
                 .orElseThrow(() -> new PlanNotFoundException());
@@ -79,7 +88,6 @@ public class InvitationService {
         invitationsRepository.save(newInvitation);
 
         log.info("사용자 초대 완료");
-
         return newInvitation.getInvitationId();
     }
 

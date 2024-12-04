@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * 사용자 정보 조회를 위한 Feign Client
  */
-@FeignClient(name = "USER-SERVICE")
+@FeignClient(name = "user-service")
 public interface UserClient {
 
     // 닉네임으로 사용자 조회
