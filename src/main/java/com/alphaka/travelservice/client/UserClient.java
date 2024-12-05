@@ -4,7 +4,6 @@ import com.alphaka.travelservice.common.dto.UserDTO;
 import com.alphaka.travelservice.common.response.ApiResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -22,7 +21,7 @@ public interface UserClient {
 
     // ID로 사용자 조회
     @GetMapping("/users/info")
-    ApiResponse<UserDTO> findUserById(@RequestParam("id") Long id);
+    ApiResponse<UserDTO> findUserById(@RequestParam("userId") Long id);
 
     /**
      * 사용자 ID 목록으로 사용자 조회 (user-service에서 결정되는 API Path에 따라 변경될 수 있음)
