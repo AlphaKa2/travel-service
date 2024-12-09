@@ -7,8 +7,6 @@ server:
       force: true
 
 spring:
-  profiles:
-    active: local
   application:
     name: travel-service
 
@@ -40,9 +38,9 @@ spring:
 
   #datasource
   datasource:
-    url: jdbc:mysql://localhost:3306/travel_db
-    username: root
-    password: wngur9836
+    url: url
+    username: username
+    password: password
 
   #redis
   data:
@@ -58,7 +56,7 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://127.0.0.1:8761/eureka
+      defaultZone: url
 
 # develop 프로필
 ---
@@ -87,4 +85,4 @@ spring:
 
 eureka:
   client:
-    enabled: true
+    enabled: false
