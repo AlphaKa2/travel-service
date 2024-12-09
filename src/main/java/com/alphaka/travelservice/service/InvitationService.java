@@ -109,16 +109,30 @@ public class InvitationService {
 
         // DTO로 매핑
         List<InvitationListDTO> invitationDTOs = result.stream()
-                .map(invitation -> InvitationListDTO.builder()
-                        .travelId(invitation.getTravelPlans().getTravelId())
-                        .invitationId(invitation.getInvitationId())
-                        .invitationMessage(invitation.getInvitationMessage())
-                        .invitationStatus(invitation.getStatus())
-                        .build())
+                .map(invitation -> {
+                    // 여행지 정보를 가져오기
+                    TravelPlans travelPlan = invitation.getTravelPlans();
+
+                    // 여행지 소유자의 닉네임 가져오기 (FeignClient 호출)
+                    ApiResponse<UserDTO> userResponse = userClient.findUserById(travelPlan.getUserId());
+                    UserDTO travelOwner = userResponse.getData();
+
+                    // InvitationListDTO 생성
+                    return InvitationListDTO.builder()
+                            .travelId(travelPlan.getTravelId())
+                            .invitationId(invitation.getInvitationId())
+                            .invitationMessage(invitation.getInvitationMessage())
+                            .invitationStatus(invitation.getStatus())
+                            .startDate(travelPlan.getStartDate())
+                            .endDate(travelPlan.getEndDate())
+                            .invitedNick(travelOwner.getNickname())
+                            .build();
+                })
                 .collect(Collectors.toList());
 
         return invitationDTOs;
     }
+
 
     /**
      * 초대 상태 변경
@@ -134,14 +148,25 @@ public class InvitationService {
         Invitations invitation = (Invitations) invitationsRepository.findByUserIdAndTravelPlans_TravelId(currentUser.getUserId(), invitationDTO.getTravelId())
                 .orElseThrow(() -> new InvitationNotFoundException());
 
-        // 초대 상태 변경
-        invitation.changeInvitationStatus(invitationDTO.getInvitationStatus());
+        // 초대 메시지 삭제
+        if (invitationDTO.getInvitationStatus() != InvitationStatus.PENDING) {
 
-        invitationsRepository.save(invitation);
+            // 참여자 추가
+            if (invitationDTO.getInvitationStatus() == InvitationStatus.ACCEPTED) {
 
-        // 참여자 추가
-        if (invitationDTO.getInvitationStatus() == InvitationStatus.ACCEPTED) {
-            participantService.addParticipant(currentUser.getUserId(), invitationDTO.getTravelId());
+                // TravelPlan 조회
+                TravelPlans travelPlan = travelPlansRepository.findById(invitationDTO.getTravelId())
+                        .orElseThrow(() -> new PlanNotFoundException());
+
+                // 해당 TravelPlan의 참여자 수 조회
+                int currentParticipantCount = travelPlan.getParticipants().size();
+                if (currentParticipantCount > 6) {
+                    throw new InvitationOverException();
+                }
+
+                participantService.addParticipant(currentUser.getUserId(), invitationDTO.getTravelId());
+            }
+            deleteInvitation(currentUser, invitation.getInvitationId());
         }
 
         log.info("사용자 초대 상태 변경 완료");
@@ -180,6 +205,7 @@ public class InvitationService {
         List<InvitedListDTO> invitedDTOs = result.stream()
                 .map(invitation -> {
                     // Call FeignClient to get user information by ID
+                    log.info("초대한 유저 ID: {}", invitation.getUserId());
                     ApiResponse<UserDTO> userResponse = userClient.findUserById(invitation.getUserId());
                     UserDTO userDTO = userResponse.getData();
 
@@ -195,5 +221,26 @@ public class InvitationService {
                 .collect(Collectors.toList());
 
         return invitedDTOs;
+    }
+
+    @Transactional
+    public Long deleteInvitation(CurrentUser currentUser, Long invitationId) {
+        log.info("사용자 초대 삭제 시작. 현재 사용자: {}, 초대 ID: {}", currentUser.getNickname(), invitationId);
+
+        // 초대 정보 조회
+        Invitations invitation = invitationsRepository.findById(invitationId)
+                .orElseThrow(() -> new InvitationNotFoundException());
+
+        // 초대 삭제 권한 확인
+        TravelPlans travelPlan = invitation.getTravelPlans();
+        if (!currentUser.getUserId().equals(travelPlan.getUserId()) && !currentUser.getUserId().equals(invitation.getUserId())) {
+            throw new InvitationAccessException();
+        }
+
+        // 초대 삭제
+        invitationsRepository.delete(invitation);
+        log.info("초대 삭제 완료. 초대 ID: {}", invitationId);
+
+        return invitationId;
     }
 }

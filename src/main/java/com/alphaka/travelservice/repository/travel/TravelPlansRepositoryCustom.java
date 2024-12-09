@@ -29,4 +29,11 @@ public interface TravelPlansRepositoryCustom {
      * @return List<TravelPlanListResponse> - 여행 계획 목록
      */
     List<TravelPlanListResponse> getTravelPlanList(Long userId);
+
+    /**
+     * 여행 계획 목록 조회
+     * @param userId - 사용자 ID
+     * @return List<TravelPlanListResponse> - 여행 계획 목록
+     */
+    List<TravelPlanListResponse> getTravelPlanListIncludingParticipant(Long userId);
 }

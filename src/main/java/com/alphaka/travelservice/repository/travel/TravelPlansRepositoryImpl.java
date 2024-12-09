@@ -396,4 +396,65 @@ public class TravelPlansRepositoryImpl implements TravelPlansRepositoryCustom {
         private final Long dayId;
         private final TravelPlaceRequest placeRequest;
     }
+
+    /**
+     * 여행 계획 목록 조회 (사용자가 참가자로 포함된 계획만 조회)
+     * @param userId - 사용자 ID
+     * @return List<TravelPlanListResponse> - 여행 계획 목록
+     */
+    @Override
+    public List<TravelPlanListResponse> getTravelPlanListIncludingParticipant(Long userId) {
+        QTravelPlans qPlan = QTravelPlans.travelPlans;
+        QParticipants qParticipants = QParticipants.participants;
+
+        // 여행 계획 목록 조회 (사용자가 참가자로 포함된 계획만)
+        List<Tuple> tuples = queryFactory
+                .select(qPlan.travelId,
+                        qPlan.travelName,
+                        qPlan.description,
+                        qPlan.travelType,
+                        qPlan.travelStatus,
+                        qPlan.startDate,
+                        qPlan.endDate,
+                        qPlan.createdAt,
+                        qPlan.updatedAt,
+                        qParticipants.userId)
+                .from(qPlan)
+                .join(qParticipants).on(qPlan.travelId.eq(qParticipants.travelPlans.travelId))
+                .where(qParticipants.userId.eq(userId)) // 사용자가 참가자로 포함된 계획만 필터링
+                .orderBy(qPlan.createdAt.desc())
+                .fetch();
+
+        // TravelPlanListResponse와 참가자 목록 구성
+        Map<Long, TravelPlanListResponse> travelPlanMap = new LinkedHashMap<>();
+        for (Tuple tuple : tuples) {
+            Long travelId = tuple.get(qPlan.travelId);
+            TravelPlanListResponse travelPlan = travelPlanMap.get(travelId);
+
+            if (travelPlan == null) {
+                travelPlan = new TravelPlanListResponse(
+                        travelId,
+                        tuple.get(qPlan.travelName),
+                        tuple.get(qPlan.description),
+                        tuple.get(qPlan.travelType),
+                        tuple.get(qPlan.travelStatus),
+                        tuple.get(qPlan.startDate),
+                        tuple.get(qPlan.endDate),
+                        tuple.get(qPlan.createdAt),
+                        tuple.get(qPlan.updatedAt)
+                );
+                travelPlanMap.put(travelId, travelPlan);
+            }
+
+            // 여행 동행자 ID가 존재할 경우에만 추가
+            Long participantId = tuple.get(qParticipants.userId);
+            if (participantId != null) {
+                // 참가자 닉네임은 서비스 계층에서 매핑
+                travelPlan.getParticipants().add(participantId.toString()); // 임시로 ID를 문자열로 추가
+            }
+        }
+
+        return new ArrayList<>(travelPlanMap.values());
+    }
+
 }

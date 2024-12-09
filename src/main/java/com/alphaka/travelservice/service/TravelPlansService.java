@@ -45,7 +45,7 @@ public class TravelPlansService {
         log.info("여행 계획 목록 조회 시작. 현재 사용자: {}", currentUser.getNickname());
 
         // 여행 계획 목록 조회
-        List<TravelPlanListResponse> travelPlanList = travelPlansRepository.getTravelPlanList(currentUser.getUserId());
+        List<TravelPlanListResponse> travelPlanList = travelPlansRepository.getTravelPlanListIncludingParticipant(currentUser.getUserId());
 
         // 여행 동행자 ID 목록 가져오기
         Set<Long> allParticipantIds = travelPlanList.stream()

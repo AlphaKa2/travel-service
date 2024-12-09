@@ -42,9 +42,17 @@ public class InvitationController {
     }
 
     @GetMapping("/{travelId}")
-    public ApiResponse<List<InvitedListDTO>> listInvitedByTravelId(CurrentUser currentUser, @PathVariable Long travelId) {
+    public ApiResponse<List<InvitedListDTO>> listInvitedByTravelId(CurrentUser currentUser, @PathVariable("travelId") Long travelId) {
 
         List<InvitedListDTO> response = invitationService.getInvited(currentUser, travelId);
         return new ApiResponse<>(response);
     }
+
+    @DeleteMapping("/{invitationId}")
+    public ApiResponse<Long> deleteInvitationById(CurrentUser currentUser, @PathVariable Long invitationId) {
+
+        Long response = invitationService.deleteInvitation(currentUser, invitationId);
+        return new ApiResponse<>(response);
+    }
+
 }
