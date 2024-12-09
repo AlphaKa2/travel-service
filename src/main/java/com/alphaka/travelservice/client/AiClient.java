@@ -1,6 +1,5 @@
 package com.alphaka.travelservice.client;
 
-import com.alphaka.travelservice.common.response.ApiResponse;
 import com.alphaka.travelservice.dto.response.PreferenceResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 /**
  * 여행 추천 정보 조회를 위한 Feign Client
  */
-@FeignClient(name = "AI-SERVICE", url="ec2-13-125-174-132.ap-northeast-2.compute.amazonaws.com:8001")
+@FeignClient(name = "AI-SERVICE", url="ec2-13-125-174-132.ap-northeast-2.compute.amazonaws.com:8000")
 public interface AiClient {
 
     /**
