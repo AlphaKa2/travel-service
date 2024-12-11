@@ -34,6 +34,12 @@ pipeline {
             }
         }
 
+        stage('Prepare Certificates') {
+            steps {
+                sh 'cp /var/jenkins_home/elastic-stack-ca.pem ./elastic-stack-ca.pem'
+            }
+        }
+
         stage('Build & Test') {
             steps {
                 sh './gradlew clean build -Dspring.profiles.active=develop --no-daemon -x test'
