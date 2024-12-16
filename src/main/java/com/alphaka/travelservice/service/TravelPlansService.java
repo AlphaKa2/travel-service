@@ -4,6 +4,7 @@ import com.alphaka.travelservice.client.UserClient;
 import com.alphaka.travelservice.common.dto.CurrentUser;
 import com.alphaka.travelservice.common.dto.UserDTO;
 import com.alphaka.travelservice.dto.request.*;
+import com.alphaka.travelservice.dto.response.ParticipantListDTO;
 import com.alphaka.travelservice.dto.response.TravelPlanListResponse;
 import com.alphaka.travelservice.dto.response.TravelPlanResponse;
 import com.alphaka.travelservice.entity.*;
@@ -18,10 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -104,6 +102,10 @@ public class TravelPlansService {
             throw new ParticipantNotFoundException();
         }
 
+        // 현재 사용자의 참가 정보 조회
+        ParticipantListDTO currentUserParticipant = participantService.getParticipantById(currentUser, travelId);
+
+
         // 참가자 닉네임 목록 설정
         List<UserDTO> participantsInfo = userClient.getUsersById(participantsList).getData();
         travelPlan.setParticipants(participantsInfo.stream()
@@ -118,7 +120,7 @@ public class TravelPlansService {
                 .getData()
                 .getNickname();
         travelPlan.setLastUpdatedBy(lastUpdatedByNickname);
-
+        travelPlan.setPermission(currentUserParticipant.getPermission());
         return travelPlan;
     }
 

@@ -133,6 +133,39 @@ public class ParticipantService {
     }
 
     /**
+     * 여행지 참여자 상세 조회
+     * @param currentUser - 현재 사용자 정보
+     * @param travelId - 여행지 ID
+     * @return ParticipantListDTO - 참여자 정보
+     */
+    public ParticipantListDTO getParticipantById(CurrentUser currentUser, Long travelId) {
+        // Q 클래스 인스턴스 가져오기
+        QParticipants participants = QParticipants.participants;
+        QTravelPlans travelPlans = QTravelPlans.travelPlans;
+
+        // 현재 사용자가 해당 여행지의 참여자인지 확인 및 참여자 정보 조회
+        Participants participant = queryFactory.selectFrom(participants)
+                .join(participants.travelPlans, travelPlans).fetchJoin()
+                .where(participants.userId.eq(currentUser.getUserId())
+                        .and(participants.travelPlans.travelId.eq(travelId)))
+                .fetchFirst();
+
+        // 참여자가 없을 경우 예외 처리
+        if (participant == null) {
+            throw new ParticipantAccessException();
+        }
+
+        // 참여자 정보 DTO 생성 및 반환
+        return ParticipantListDTO.builder()
+                .participantId(participant.getParticipantId())
+                .travelId(travelId)
+                .userId(participant.getUserId())
+                .nickname(currentUser.getNickname())
+                .permission(participant.getPermission())
+                .build();
+    }
+
+    /**
      * 참여자 권한 변경
      * @param currentUser
      * @param request

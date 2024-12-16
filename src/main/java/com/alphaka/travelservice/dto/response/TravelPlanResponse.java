@@ -1,5 +1,6 @@
 package com.alphaka.travelservice.dto.response;
 
+import com.alphaka.travelservice.entity.Permission;
 import com.alphaka.travelservice.entity.TravelStatus;
 import com.alphaka.travelservice.entity.TravelType;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -26,6 +27,7 @@ public class TravelPlanResponse {
     private List<TravelDayResponse> days = new ArrayList<>();
     private String lastUpdatedBy;
     private List<String> participants;
+    private Permission permission;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
