@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 /**
  * 여행 추천 정보 조회를 위한 Feign Client
  */
-@FeignClient(name = "AI-SERVICE", url="ec2-13-125-174-132.ap-northeast-2.compute.amazonaws.com:8000")
+@FeignClient(name = "AI-SERVICE", url="ec2-43-203-243-169.ap-northeast-2.compute.amazonaws.com:8000")
 public interface AiClient {
 
     /**
