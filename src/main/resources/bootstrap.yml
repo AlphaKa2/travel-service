@@ -1,0 +1,26 @@
+spring:
+
+  config:
+    activate:
+      on-profile: develop
+
+  cloud:
+
+    kubernetes:
+      discovery:
+        enabled: true
+        discovery-server-url: "${DISCOVERY_URL}"
+
+      loadbalancer:
+        mode: service
+
+      config:
+        enabled: true
+        namespace: alphaka
+        name: alphaka-common-config
+
+      secrets:
+        enabled: true
+        enable-api: true
+        namespace: alphaka
+        name: alphaka-secret
